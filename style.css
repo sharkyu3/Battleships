@@ -1,0 +1,80 @@
+body{
+	font-family: 'Playfair Display', serif;
+	height: 100%;
+}
+
+h1{
+	font-size:60px;
+	margin: 0 auto;
+	padding: 30px;
+}
+
+button{
+	font-family: 'Playfair Display', serif;
+	font-size: 20px;
+	margin: 0 auto;
+	width: 240px;
+}
+
+p{
+	margin: 0 auto;
+	font-size: 25px;
+	text-align: center;
+	margin-bottom: 15px;
+}
+
+#inputField{
+	font-family: 'Playfair Display', serif;
+	font-size: 20px;
+	text-align: center;
+	min-width: 150px;
+	margin: 0 auto;
+	margin-bottom: 30px;
+}
+
+#gameboard-row{
+	height:550px;
+}
+
+#gameboard-row .container{
+	width:500px;
+	height:500px;
+	margin: 0 auto;
+}
+
+.game-row{
+	width:100%;
+	height:10%;
+}
+
+.game-square{
+	border:1px solid black;
+	width:10%;
+	height:100%;
+	display: inline-block;
+	background-color: "";
+}
+
+#left-display{
+	text-align: center;
+	height: 100%;
+}
+
+#shipBox{
+	height:18%;
+	margin: 7px auto;
+	font-size: 15px;
+	border: 2px solid grey;
+}
+
+.miniDisplay{
+	height:40%;
+	text-align: center;
+	margin: 0 auto;
+}
+
+#shipTitle{
+	font-weight: bold;
+  font-size: 20px;
+  padding-top: 15px;
+}
