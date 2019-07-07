@@ -1,6 +1,7 @@
 body{
 	font-family: 'Playfair Display', serif;
 	height: 100%;
+	background-image: "";
 }
 
 h1{
@@ -33,12 +34,18 @@ p{
 }
 
 #gameboard-row{
-	height:550px;
+	height:500px;
+	width:100%;
+	margin-top: 15px;
+	background-image: url("pics/fleet.jpg");
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
 }
 
 #gameboard-row .container{
-	width:500px;
-	height:500px;
+	width:100%;
+	height:100%;
 	margin: 0 auto;
 }
 
@@ -77,4 +84,36 @@ p{
 	font-weight: bold;
   font-size: 20px;
   padding-top: 15px;
+}
+
+#displayRow00{
+	height: 8%;
+	border-top: 2px solid black;
+	border-bottom: 2px solid black;
+	background-color: #44dbf7;
+	margin: 0 auto;
+	font-size: 25px;
+	display: block;
+	text-align: center;
+}
+
+#displayRow10{
+	height: 8%;
+	border-top: 2px solid black;
+	border-bottom: 2px solid black;
+	background-color: #fdc55d;
+	margin: 0 auto;
+	font-size: 25px;
+	display: block;
+	text-align: center;
+}
+
+#displayRow01{
+	height: 88%;
+	border: 2px solid blue;
+}
+
+#displayRow11{
+	height: 88%;
+	border: 2px solid blue;
 }

@@ -104,6 +104,8 @@ var boardTallyTwo = [
 
 var makeBoard = function(event){
     clearDisplay();
+    gameBoardRow.style.backgroundImage = 'none';
+
     //create left display to show ships available for placement
     var leftDisplay = document.createElement("div");
     leftDisplay.setAttribute("class", "col-3");
@@ -148,7 +150,7 @@ var makeBoard = function(event){
         //set additional attributes to mark coordinates of cell
         cellTemp.setAttribute("rowNo", i);
         cellTemp.setAttribute("colNo", j);
-        //append buttons to rows
+        //append cells to rows
         rowsTemp.appendChild(cellTemp);
     }
         //append rows to board
@@ -157,8 +159,6 @@ var makeBoard = function(event){
     //append board to body
     gameBoardRow.appendChild(leftDisplay);
     gameBoardRow.appendChild(boardTemp);
-
-    addParaToDisplay(playerOneName + " Let's place your first vessel!");
 
     if(playerTurn === "Two"){
         var squaresTemp = document.querySelectorAll(".game-square");
@@ -182,10 +182,17 @@ var fillShipsArray = function(){
 
 var fixBoats = function(){
     if(shipsToPlace.length === 0){
-        playerTurn = "Two";
-        clearGameBoardRow();
-        startCollatePlayerPositions();
-        console.log("player turn is now " + playerTurn);
+        if(playerTurn === "One"){
+            playerTurn = "Two";
+            clearGameBoardRow();
+            startCollatePlayerPositions();
+        }else{
+            clearDisplay();
+            clearGameBoardRow();
+            addParaToDisplay("MAN YOUR STATIONS!!!!!");
+            showBoth();
+            //***gameplay function***
+        };
     }else{
         for(j=0; j<ships.length; j++){
         if (shipsToPlace[0] === ships[j].ShipName){
@@ -235,7 +242,53 @@ var logSquares = function(event){
         }
     }
 }
+};
 
+var tinyGrid = function(){
+    for(i=0; i<2; i++){
+        //create div id = board
+        var boardTemp = document.createElement("div");
+        boardTemp.setAttribute("class", "col-9");
+        boardTemp.setAttribute("id", "main-board"+i);
+        //create div class = game-row x10
+        for(i=j=0; j<gridSize; j++){
+            var rowsTemp = document.createElement("div");
+            rowsTemp.setAttribute("class","row");
+            rowsTemp.setAttribute("class", "game-row")
+        //create button class = game-square x10 per row
+            for (k=0;k<gridSize; k++){
+            var cellTemp = document.createElement("div");
+            cellTemp.setAttribute("class","game-square");
+            //set additional attributes to mark coordinates of cell
+            cellTemp.setAttribute("rowNo", i);
+            cellTemp.setAttribute("colNo", j);
+            //append buttons to rows
+            rowsTemp.appendChild(cellTemp);
+        }
+            //append rows to board
+            boardTemp.appendChild(rowsTemp);
+        }
+    }
+}
+
+var showBoth = function(){
+    for(i=0; i<2; i++){
+        var tempRow = document.createElement("div");
+        tempRow.setAttribute("class", "col-6");
+        tempRow.setAttribute("id", "displayCol"+[i])
+        for (j=0; j<2; j++){
+            var tempCol = document.createElement('div');
+            tempCol.setAttribute("class", "row");
+            tempCol.setAttribute("id", "displayRow" + [i]+[j]);
+            tempRow.appendChild(tempCol);
+        }
+        gameBoardRow.appendChild(tempRow);
+    }
+    var box1 = document.getElementById("displayRow00");
+    box1.textContent = "Admiral " + playerOneName + "'s grid";
+    var box2 = document.getElementById("displayRow10");
+    box2.textContent = "Admiral " + playerTwoName + "'s grid";
+    tinyGrid();
 }
 
 var clearDisplay = function(){
@@ -273,5 +326,4 @@ var clearGameBoardRow = function(){
 document.addEventListener('DOMContentLoaded', function( event ){
   // now that the dom is ready, set the button click
   startButton.addEventListener('click', startGame);
-
 });
