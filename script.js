@@ -3,6 +3,7 @@ console.log("Ready for war!!!");
 var gridSize = 10;
 var playerOneName = null;
 var playerTwoName = null;
+var playerTurn = "One";
 
 var startButton = document.getElementById("start");
 var displayRow = document.getElementById("row2");
@@ -58,11 +59,14 @@ var startGame = function(event){
 }
 
 var startCollatePlayerPositions = function(){
-
-    addParaToDisplay("Time for " + playerOneName + " to set your board!" + "\n" + "Click on the button below when you have the screen to yourself!");
-
     var readyTemp = document.createElement("button");
-    readyTemp.textContent = playerOneName + " is ready!"
+    if(playerTurn === "One"){
+        addParaToDisplay("Time for " + playerOneName + " to set your board!" + "\n" + "Click on the button below when you have the screen to yourself!");
+        readyTemp.textContent = playerOneName + " is ready!"
+    }else{
+        addParaToDisplay("Time for " + playerTwoName + " to set your board!" + "\n" + "Click on the button below when you have the screen to yourself!");
+        readyTemp.textContent = playerTwoName + " is ready!"
+    }
     readyTemp.addEventListener("click", makeBoard);
     readyTemp.addEventListener("click",fixBoats);
     displayRow.appendChild(readyTemp);
@@ -70,7 +74,22 @@ var startCollatePlayerPositions = function(){
     fillShipsArray();
 }
 
-var boardTally = [
+var compileTurnAndBoard = "boardTally" + playerTurn;
+
+var boardTallyOne = [
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+];
+
+var boardTallyTwo = [
 [null,null,null,null,null,null,null,null,null,null],
 [null,null,null,null,null,null,null,null,null,null],
 [null,null,null,null,null,null,null,null,null,null],
@@ -139,7 +158,14 @@ var makeBoard = function(event){
     gameBoardRow.appendChild(leftDisplay);
     gameBoardRow.appendChild(boardTemp);
 
-    addParaToDisplay("Let's place your first vessel!");
+    addParaToDisplay(playerOneName + " Let's place your first vessel!");
+
+    if(playerTurn === "Two"){
+        var squaresTemp = document.querySelectorAll(".game-square");
+        for (i=0; i<squaresTemp.length; i++){
+            squaresTemp[i].style.backgroundColor = "#fbdda57a";
+        };
+    }
 }
 
 var noOfSquaresToPlace = null;
@@ -155,8 +181,13 @@ var fillShipsArray = function(){
 };
 
 var fixBoats = function(){
-    console.log("ship array before click" + shipsToPlace);
-    for(j=0; j<ships.length; j++){
+    if(shipsToPlace.length === 0){
+        playerTurn = "Two";
+        clearGameBoardRow();
+        startCollatePlayerPositions();
+        console.log("player turn is now " + playerTurn);
+    }else{
+        for(j=0; j<ships.length; j++){
         if (shipsToPlace[0] === ships[j].ShipName){
             clearDisplay();
             noOfSquaresToPlace = parseInt(ships[j].Squares);
@@ -165,6 +196,7 @@ var fixBoats = function(){
             shipTemp.style.border = "5px solid red";
             addParaToDisplay("Let's place your " + ships[j].ShipName + " which requires " + noOfSquaresToPlace + " squares");
             addSquaresEvent();
+            }
         }
     }
 }
@@ -188,11 +220,16 @@ var logSquares = function(event){
     var cdn = [this.getAttribute("rowNo"), this.getAttribute("colNo")];
     var firstIndex = cdn[0];
     var secondIndex = cdn[1];
-    for (i=0; i<boardTally.length; i++) {
+    for (i=0; i<boardTallyOne.length; i++) {
         if (i === parseInt(firstIndex)) {
-            for (j=0; j<boardTally[i].length; j++) {
+            for (j=0; j<boardTallyOne[i].length; j++) {
                 if (j === parseInt(secondIndex)) {
-                    boardTally[i][j] = shipLetter;
+                    if (playerTurn === "One"){
+                        boardTallyOne[i][j] = shipLetter;
+                    }else{
+                        boardTallyTwo[i][j] = shipLetter;
+                    }
+
                 }
             }
         }
@@ -225,6 +262,12 @@ var removeSquaresEvent = function() {
         for (i=0; i<squaresTemp.length; i++){
             squaresTemp[i].removeEventListener("click",logSquares);
         };
+};
+
+var clearGameBoardRow = function(){
+    while (gameBoardRow.firstChild){
+        gameBoardRow.removeChild(gameBoardRow.firstChild);
+    };
 };
 
 document.addEventListener('DOMContentLoaded', function( event ){
