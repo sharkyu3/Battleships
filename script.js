@@ -4,7 +4,6 @@ var gridSize = 10;
 var playerOneName = null;
 var playerTwoName = null;
 var playerTurn = "One";
-
 var playerOneWinCount = 0;
 var playerTwoWinCount = 0;
 
@@ -74,6 +73,9 @@ var startGame = function(event){
 }
 
 var startCollatePlayerPositions = function(){
+    clearDisplay();
+    clearGameBoardRow();
+
     var readyTemp = document.createElement("button");
     if(playerTurn === "One"){
         addParaToDisplay("Time for " + playerOneName + " to set your board!" + "\n" + "Click on the button below when you have the screen to yourself!");
@@ -116,7 +118,7 @@ var boardTallyTwo = [
 ];
 
 var makeBoard = function(event){
-    clearDisplay();
+
     gameBoardRow.style.backgroundImage = 'none';
 
     //create left display to show ships available for placement
@@ -341,16 +343,20 @@ var checkClick = function(){
                             totalToDestroy2--;
                             if(boardTallyTwo[i][j] === "C"){
                                 carrierCells2--;
+                                boardTallyTwo[i][j] = "H";
                             }else if(boardTallyTwo[i][j] === "B"){
                                 battleshipCells2--;
+                                boardTallyTwo[i][j] = "H";
                             }else if(boardTallyTwo[i][j] === "S"){
                                 submarineCells2--;
+                                boardTallyTwo[i][j] = "H";
                             }else if(boardTallyTwo[i][j] === "D"){
                                 destroyerCells2--;
+                                boardTallyTwo[i][j] = "H";
                             }else if(boardTallyTwo[i][j] === "P"){
                                 patrolCells2--;
+                                boardTallyTwo[i][j] = "H";
                             }
-                            boardTallyTwo[i][j] = "H";
                         }else if (boardTallyTwo[i][j] === null){
                             boardTallyTwo[i][j] = "X";
                             this.style.backgroundImage = "url('pics/splash.png')";
@@ -372,16 +378,21 @@ var checkClick = function(){
                             totalToDestroy--;
                             if(boardTallyOne[i][j] === "C"){
                                 carrierCells--;
+                                boardTallyOne[i][j] = "H";
                             }else if(boardTallyOne[i][j] === "B"){
                                 battleshipCells--;
+                                boardTallyOne[i][j] = "H";
                             }else if(boardTallyOne[i][j] === "S"){
                                 submarineCells--;
+                                boardTallyOne[i][j] = "H";
                             }else if(boardTallyOne[i][j] === "D"){
                                 destroyerCells--;
+                                boardTallyOne[i][j] = "H";
                             }else if(boardTallyOne[i][j] === "P"){
                                 patrolCells--;
+                                boardTallyOne[i][j] = "H";
                             }
-                            boardTallyOne[i][j] = "H";
+                            // boardTallyOne[i][j] = "H";
                         }else if (boardTallyOne[i][j] === null){
                             boardTallyOne[i][j] = "X";
                             this.style.backgroundImage = "url('pics/splash.png')";
@@ -432,6 +443,9 @@ var checkForSink = function(){
         if(totalToDestroy2 === 0){
             alert("VICTORY FOR " + playerOneName);
             playerOneWinCount++;
+            clearDisplay();
+            addParaToDisplay(playerOneName + "'s wins = " + playerOneWinCount + " vs" + playerTwoName + "'s wins = " + playerTwoWinCount);
+            replayGame();
         }else if(totalToDestroy2 > 0){
             if(carrierCells2 === 0){
                 alert("You have sunk Admiral " + playerTwoName + "'s CARRIER!");
@@ -456,6 +470,9 @@ var checkForSink = function(){
         if(totalToDestroy === 0){
             alert("VICTORY FOR " + playerTwoName);
             playerTwoWinCount++;
+            clearDisplay();
+            addParaToDisplay(playerOneName + "'s wins = " + playerOneWinCount + " vs" + playerTwoName + "'s wins = " + playerTwoWinCount);
+            replayGame();
         }else if (totalToDestroy > 0){
             if(carrierCells === 0){
                 alert("You have sunk Admiral " + playerOneName + "'s CARRIER!");
@@ -476,6 +493,60 @@ var checkForSink = function(){
             gamePlay();
         }
     }
+}
+
+var replayGame = function(){
+    playerTurn = "One";
+    clearGameBoardRow();
+    clearDisplay();
+    addParaToDisplay("Would you like to play another round?");
+
+    boardTallyOne = [
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+];
+
+boardTallyTwo = [
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null],
+];
+
+    // for(i=0; i<boardTallyOne.length; i++){
+    //     for(j=0; j<boardTallyOne[i]; j++){
+    //         if(boardTallyOne[i][j] === "H" || boardTallyOne[i][j] === "X" || boardTallyOne[i][j] === "C" || boardTallyOne[i][j] === "B" || boardTallyOne[i][j] === "S" || boardTallyOne[i][j] === "D" || boardTallyOne[i][j] === "P"){
+    //             boardTallyOne[i][j] = null;
+    //         }
+    //     }
+    // }
+    // for(i=0; i<boardTallyTwo.length; i++){
+    //     for(j=0; j<boardTallyTwo[i]; j++){
+    //         if(boardTallyTwo[i][j] === "H" || boardTallyTwo[i][j] === "X" || boardTallyTwo[i][j] === "C" || boardTallyTwo[i][j] === "B" || boardTallyTwo[i][j] === "S" || boardTallyTwo[i][j] === "D" || boardTallyTwo[i][j] === "P"){
+    //             boardTallyTwo[i][j] = null;
+    //         }
+    //     }
+    // }
+
+    var buttonRepeat = document.createElement("button");
+    buttonRepeat.setAttribute("id", "start2");
+    buttonRepeat.textContent = "Let's go again!"
+    buttonRepeat.addEventListener("click", startCollatePlayerPositions);
+    gameBoardRow.appendChild(buttonRepeat);
 }
 
 document.addEventListener('DOMContentLoaded', function( event ){
