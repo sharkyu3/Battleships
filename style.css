@@ -109,11 +109,22 @@ p{
 }
 
 #displayRow01{
-	height: 88%;
-	border: 2px solid blue;
+	height: 90%;
 }
 
 #displayRow11{
-	height: 88%;
-	border: 2px solid blue;
+	height: 90%;
+}
+
+.mainBoard1{
+	width: 100%;
+}
+
+#mainBoard2{
+	width: 100%;
+}
+
+#mainBoard1{
+	width: 100%;
+	background-color: #fbdda57a;
 }

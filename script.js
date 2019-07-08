@@ -134,10 +134,21 @@ var makeBoard = function(event){
         }
         leftDisplay.appendChild(shipRows);
     }
+    gameBoardRow.appendChild(leftDisplay);
+    makeGrid();
+    if(playerTurn === "Two"){
+        var squaresTemp = document.querySelectorAll(".game-square");
+        for (i=0; i<squaresTemp.length; i++){
+            squaresTemp[i].style.backgroundColor = "#fbdda57a";
+        };
+    }
+}
+
+var makeGrid = function(){
     //create div id = board
     var boardTemp = document.createElement("div");
     boardTemp.setAttribute("class", "col-9");
-    boardTemp.setAttribute("id", "main-board");
+    boardTemp.setAttribute("title", "main-board");
     //create div class = game-row x10
     for(i=0; i<gridSize; i++){
         var rowsTemp = document.createElement("div");
@@ -157,15 +168,7 @@ var makeBoard = function(event){
         boardTemp.appendChild(rowsTemp);
     }
     //append board to body
-    gameBoardRow.appendChild(leftDisplay);
     gameBoardRow.appendChild(boardTemp);
-
-    if(playerTurn === "Two"){
-        var squaresTemp = document.querySelectorAll(".game-square");
-        for (i=0; i<squaresTemp.length; i++){
-            squaresTemp[i].style.backgroundColor = "#fbdda57a";
-        };
-    }
 }
 
 var noOfSquaresToPlace = null;
@@ -184,6 +187,7 @@ var fixBoats = function(){
     if(shipsToPlace.length === 0){
         if(playerTurn === "One"){
             playerTurn = "Two";
+            console.log("it is player 2's turn");
             clearGameBoardRow();
             startCollatePlayerPositions();
         }else{
@@ -244,33 +248,6 @@ var logSquares = function(event){
 }
 };
 
-var tinyGrid = function(){
-    for(i=0; i<2; i++){
-        //create div id = board
-        var boardTemp = document.createElement("div");
-        boardTemp.setAttribute("class", "col-9");
-        boardTemp.setAttribute("id", "main-board"+i);
-        //create div class = game-row x10
-        for(i=j=0; j<gridSize; j++){
-            var rowsTemp = document.createElement("div");
-            rowsTemp.setAttribute("class","row");
-            rowsTemp.setAttribute("class", "game-row")
-        //create button class = game-square x10 per row
-            for (k=0;k<gridSize; k++){
-            var cellTemp = document.createElement("div");
-            cellTemp.setAttribute("class","game-square");
-            //set additional attributes to mark coordinates of cell
-            cellTemp.setAttribute("rowNo", i);
-            cellTemp.setAttribute("colNo", j);
-            //append buttons to rows
-            rowsTemp.appendChild(cellTemp);
-        }
-            //append rows to board
-            boardTemp.appendChild(rowsTemp);
-        }
-    }
-}
-
 var showBoth = function(){
     for(i=0; i<2; i++){
         var tempRow = document.createElement("div");
@@ -288,7 +265,24 @@ var showBoth = function(){
     box1.textContent = "Admiral " + playerOneName + "'s grid";
     var box2 = document.getElementById("displayRow10");
     box2.textContent = "Admiral " + playerTwoName + "'s grid";
-    tinyGrid();
+    makeGrid();
+    makeGrid();
+    var board = document.querySelectorAll(".col-9");
+    for(k=0; k<board.length; k++){
+        board[k].setAttribute("id", "mainboard" + k);
+        board[k].setAttribute("class", "col-12");
+    }
+    var board1 = document.getElementById("mainboard0");
+    var box3 = document.getElementById("displayRow01");
+    box3.appendChild(board1);
+    var board2 = document.getElementById("mainboard1");
+    var box4 = document.getElementById("displayRow11");
+    box4.appendChild(board2);
+
+    var squares2 = document.querySelectorAll("#mainboard1 .game-square");
+    for (l=0;l<squares2.length; l++){
+        squares2[l].style.backgroundColor = "#fbdda57a";
+    }
 }
 
 var clearDisplay = function(){
