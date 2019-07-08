@@ -60,6 +60,9 @@ p{
 	height:100%;
 	display: inline-block;
 	background-color: #b4ebf582;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
 }
 
 #left-display{
@@ -126,5 +129,9 @@ p{
 
 #mainBoard1{
 	width: 100%;
-	background-color: #fbdda57a;
+}
+
+#ack{
+	margin: 20px auto;
+	text-align: center;
 }
