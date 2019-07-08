@@ -59,7 +59,7 @@ p{
 	width:10%;
 	height:100%;
 	display: inline-block;
-	background-color: #b4ebf582;
+	background-color: #b4ebf5c2;
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-position: center;
@@ -76,6 +76,7 @@ p{
 	margin: 7px auto;
 	font-size: 15px;
 	border: 2px solid grey;
+	background-color: #ffffffdb;
 }
 
 .miniDisplay{

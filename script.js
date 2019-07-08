@@ -7,9 +7,14 @@ var playerTurn = "One";
 var playerOneWinCount = 0;
 var playerTwoWinCount = 0;
 
+function playSound(soundfile){
+    document.getElementById("sound").innerHTML="<embed src=\""+soundfile+"\" hidden=\"true\" autostart=\"true\" loop=\"false\"/>";
+}
+
 var startButton = document.getElementById("start");
 var displayRow = document.getElementById("row2");
 var gameBoardRow = document.getElementById("gameboard-row");
+var container = document.querySelector(".container");
 
 var ships = [
     {
@@ -120,6 +125,11 @@ var boardTallyTwo = [
 var makeBoard = function(event){
 
     gameBoardRow.style.backgroundImage = 'none';
+    container.style.backgroundImage = "url('pics/warroom.jpg')";
+    var header = document.querySelector("h1");
+    var para = document.getElementById("row2");
+    header.style.color = "white";
+    para.style.color = "white";
 
     //create left display to show ships available for placement
     var leftDisplay = document.createElement("div");
@@ -154,7 +164,7 @@ var makeBoard = function(event){
     if(playerTurn === "Two"){
         var squaresTemp = document.querySelectorAll(".game-square");
         for (i=0; i<squaresTemp.length; i++){
-            squaresTemp[i].style.backgroundColor = "#fbdda57a";
+            squaresTemp[i].style.backgroundColor = "#fbdda5d9";
         };
     }
 }
@@ -238,8 +248,8 @@ var logSquares = function(event){
     }else if(noOfSquaresToPlace >= 0){
     clearDisplay();
     addParaToDisplay("You need to place " + noOfSquaresToPlace + " more squares for this vessel.")
-    //turn cell black to indicate that space has been taken and remove click event for that cell
-    this.style.backgroundColor = "black";
+    //turn cell color to indicate that space has been taken and remove click event for that cell
+    this.style.backgroundColor = "#f7e868";
     this.removeEventListener("click", logSquares);
 
     //grab coordinates of cell and fill in array
@@ -295,7 +305,7 @@ var showBoth = function(){
 
     var squares2 = document.querySelectorAll("#mainboard1 .game-square");
     for (l=0;l<squares2.length; l++){
-        squares2[l].style.backgroundColor = "#fbdda57a";
+        squares2[l].style.backgroundColor = "#fbdda5d9";
     }
 }
 
@@ -340,6 +350,7 @@ var checkClick = function(){
                         }else if (boardTallyTwo[i][j] === "C" || boardTallyTwo[i][j] === "B" || boardTallyTwo[i][j] === "S" || boardTallyTwo[i][j] === "D" || boardTallyTwo[i][j] === "P"){
                             this.style.backgroundImage = "url('pics/boom.png')";
                             this.style.backgroundColor = "red";
+                            playSound("sounds/explode.mp3");
                             totalToDestroy2--;
                             if(boardTallyTwo[i][j] === "C"){
                                 carrierCells2--;
@@ -360,6 +371,7 @@ var checkClick = function(){
                         }else if (boardTallyTwo[i][j] === null){
                             boardTallyTwo[i][j] = "X";
                             this.style.backgroundImage = "url('pics/splash.png')";
+                            playSound("sounds/splash.mp3");
                     }
                 }
             }
