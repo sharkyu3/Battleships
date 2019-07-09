@@ -47,6 +47,9 @@ p{
 	width:100%;
 	height:100%;
 	margin: 0 auto;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
 }
 
 .game-row{

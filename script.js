@@ -7,9 +7,9 @@ var playerTurn = "One";
 var playerOneWinCount = 0;
 var playerTwoWinCount = 0;
 
-function playSound(soundfile){
-    document.getElementById("sound").innerHTML="<embed src=\""+soundfile+"\" hidden=\"true\" autostart=\"true\" loop=\"false\"/>";
-}
+var boom = new Audio('sounds/explode.mp3');
+var splash = new Audio('sounds/splash.mp3');
+var cheer = new Audio('sounds/cheers.mp3');
 
 var startButton = document.getElementById("start");
 var displayRow = document.getElementById("row2");
@@ -122,8 +122,7 @@ var boardTallyTwo = [
 [null,null,null,null,null,null,null,null,null,null],
 ];
 
-var makeBoard = function(event){
-
+var makeBoard = function(){
     gameBoardRow.style.backgroundImage = 'none';
     container.style.backgroundImage = "url('pics/warroom.jpg')";
     var header = document.querySelector("h1");
@@ -273,6 +272,9 @@ var logSquares = function(event){
 };
 
 var showBoth = function(){
+
+    container.style.backgroundImage = "url('pics/war.png')";
+
     for(i=0; i<2; i++){
         var tempRow = document.createElement("div");
         tempRow.setAttribute("class", "col-6");
@@ -317,10 +319,24 @@ var gamePlay = function(){
         for (i=0;i<squares.length; i++){
             squares[i].removeEventListener("click", checkClick);
         }
-        var squares = document.querySelectorAll("#mainboard1 .game-square");
-        for (i=0;i<squares.length; i++){
-            squares[i].addEventListener("click", checkClick);
+        var squares1 = document.querySelectorAll("#mainboard1 .game-square");
+        for (i=0; i<squares1.length; i++){
+            var cdn = [squares1[i].getAttribute("rowNo"), squares1[i].getAttribute("colNo")];
+            var firstIndex = cdn[0];
+            var secondIndex = cdn[1];
+
+            for (j=0;j<boardTallyTwo.length; j++){
+            if (j === parseInt(firstIndex)) {
+                for (k=0; k<boardTallyTwo[j].length; k++) {
+                    if (k === parseInt(secondIndex)) {
+                        if(boardTallyTwo[j][k] === "C" || boardTallyTwo[j][k] === "B" || boardTallyTwo[j][k] === "S" || boardTallyTwo[j][k] === "D" || boardTallyTwo[j][k] === "P" || boardTallyTwo[j][k] === null){
+                            squares1[i].addEventListener("click", checkClick);
+                        }
+                    }
+                }
+            }
         }
+    }
     }else if(playerTurn === "Two"){
         clearDisplay();
         addParaToDisplay(playerTwoName + "'s turn! Click on a cell on your opponent's grid.");
@@ -328,9 +344,22 @@ var gamePlay = function(){
         for (i=0;i<squares.length; i++){
             squares[i].removeEventListener("click", checkClick);
         }
-        var squares = document.querySelectorAll("#mainboard0 .game-square");
-        for (i=0;i<squares.length; i++){
-            squares[i].addEventListener("click", checkClick);
+        var squares1 = document.querySelectorAll("#mainboard0 .game-square");
+        for (i=0; i<squares1.length; i++){
+            var cdn = [squares1[i].getAttribute("rowNo"), squares1[i].getAttribute("colNo")];
+            var firstIndex = cdn[0];
+            var secondIndex = cdn[1];
+            for (j=0;j<boardTallyOne.length; j++){
+            if (j === parseInt(firstIndex)) {
+                for (k=0; k<boardTallyOne[j].length; k++) {
+                    if (k === parseInt(secondIndex)) {
+                        if(boardTallyOne[j][k] === "C" || boardTallyOne[j][k] === "B" || boardTallyOne[j][k] === "S" || boardTallyOne[j][k] === "D" || boardTallyOne[j][k] === "P" || boardTallyOne[j][k] === null){
+                            squares1[i].addEventListener("click", checkClick);
+                        }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -350,7 +379,7 @@ var checkClick = function(){
                         }else if (boardTallyTwo[i][j] === "C" || boardTallyTwo[i][j] === "B" || boardTallyTwo[i][j] === "S" || boardTallyTwo[i][j] === "D" || boardTallyTwo[i][j] === "P"){
                             this.style.backgroundImage = "url('pics/boom.png')";
                             this.style.backgroundColor = "red";
-                            playSound("sounds/explode.mp3");
+                            boom.play();
                             totalToDestroy2--;
                             if(boardTallyTwo[i][j] === "C"){
                                 carrierCells2--;
@@ -371,7 +400,7 @@ var checkClick = function(){
                         }else if (boardTallyTwo[i][j] === null){
                             boardTallyTwo[i][j] = "X";
                             this.style.backgroundImage = "url('pics/splash.png')";
-                            playSound("sounds/splash.mp3");
+                            splash.play();
                     }
                 }
             }
@@ -387,6 +416,7 @@ var checkClick = function(){
                         }else if (boardTallyOne[i][j] === "C" || boardTallyOne[i][j] === "B" || boardTallyOne[i][j] === "S" || boardTallyOne[i][j] === "D" || boardTallyOne[i][j] === "P"){
                             this.style.backgroundImage = "url('pics/boom.png')";
                             this.style.backgroundColor = "red";
+                            boom.play();
                             totalToDestroy--;
                             if(boardTallyOne[i][j] === "C"){
                                 carrierCells--;
@@ -404,10 +434,10 @@ var checkClick = function(){
                                 patrolCells--;
                                 boardTallyOne[i][j] = "H";
                             }
-                            // boardTallyOne[i][j] = "H";
                         }else if (boardTallyOne[i][j] === null){
                             boardTallyOne[i][j] = "X";
                             this.style.backgroundImage = "url('pics/splash.png')";
+                            splash.play();
                     }
                 }
             }
@@ -453,10 +483,11 @@ var checkForSink = function(){
     if(playerTurn === "One"){
         playerTurn = "Two";
         if(totalToDestroy2 === 0){
-            alert("VICTORY FOR " + playerOneName);
+            alert("VICTORY FOR " + playerOneName + "!!!");
+            cheer.play();
             playerOneWinCount++;
             clearDisplay();
-            addParaToDisplay(playerOneName + "'s wins = " + playerOneWinCount + " vs" + playerTwoName + "'s wins = " + playerTwoWinCount);
+            container.style.backgroundImage = "url('pics/sea.JPG')";
             replayGame();
         }else if(totalToDestroy2 > 0){
             if(carrierCells2 === 0){
@@ -480,10 +511,11 @@ var checkForSink = function(){
     }else if (playerTurn === "Two"){
         playerTurn = "One";
         if(totalToDestroy === 0){
-            alert("VICTORY FOR " + playerTwoName);
+            alert("VICTORY FOR " + playerTwoName + "!!!");
+            cheer.play();
             playerTwoWinCount++;
             clearDisplay();
-            addParaToDisplay(playerOneName + "'s wins = " + playerOneWinCount + " vs" + playerTwoName + "'s wins = " + playerTwoWinCount);
+            container.style.backgroundImage = "url('pics/sea.JPG')";
             replayGame();
         }else if (totalToDestroy > 0){
             if(carrierCells === 0){
@@ -514,45 +546,30 @@ var replayGame = function(){
     addParaToDisplay("Would you like to play another round?");
 
     boardTallyOne = [
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-];
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+    ];
 
-boardTallyTwo = [
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null],
-];
-
-    // for(i=0; i<boardTallyOne.length; i++){
-    //     for(j=0; j<boardTallyOne[i]; j++){
-    //         if(boardTallyOne[i][j] === "H" || boardTallyOne[i][j] === "X" || boardTallyOne[i][j] === "C" || boardTallyOne[i][j] === "B" || boardTallyOne[i][j] === "S" || boardTallyOne[i][j] === "D" || boardTallyOne[i][j] === "P"){
-    //             boardTallyOne[i][j] = null;
-    //         }
-    //     }
-    // }
-    // for(i=0; i<boardTallyTwo.length; i++){
-    //     for(j=0; j<boardTallyTwo[i]; j++){
-    //         if(boardTallyTwo[i][j] === "H" || boardTallyTwo[i][j] === "X" || boardTallyTwo[i][j] === "C" || boardTallyTwo[i][j] === "B" || boardTallyTwo[i][j] === "S" || boardTallyTwo[i][j] === "D" || boardTallyTwo[i][j] === "P"){
-    //             boardTallyTwo[i][j] = null;
-    //         }
-    //     }
-    // }
+    boardTallyTwo = [
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null,null,null],
+    ];
 
     var buttonRepeat = document.createElement("button");
     buttonRepeat.setAttribute("id", "start2");
