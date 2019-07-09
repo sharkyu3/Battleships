@@ -236,6 +236,9 @@ var fixBoats = function(){
     }
 }
 
+var currentX = null;
+var currentY = null;
+
 var logSquares = function(event){
     clearDisplay();
     noOfSquaresToPlace--;
@@ -244,21 +247,20 @@ var logSquares = function(event){
         removeSquaresEvent();
         shipsToPlace.shift();
         fixBoats();
+        currentX === null;
+        currentY === null;
     }else if(noOfSquaresToPlace >= 0){
     clearDisplay();
     addParaToDisplay("You need to place " + noOfSquaresToPlace + " more squares for this vessel.")
-    //turn cell color to indicate that space has been taken and remove click event for that cell
-    this.style.backgroundColor = "#f7e868";
-    this.removeEventListener("click", logSquares);
 
     //grab coordinates of cell and fill in array
-    var cdn = [this.getAttribute("rowNo"), this.getAttribute("colNo")];
-    var firstIndex = cdn[0];
-    var secondIndex = cdn[1];
+    // var cdn = [this.getAttribute("rowNo"), this.getAttribute("colNo")];
+    // var firstIndex = cdn[0];
+    // var secondIndex = cdn[1];
     for (i=0; i<boardTallyOne.length; i++) {
-        if (i === parseInt(firstIndex)) {
+        if (i === parseInt(currentX)) {
             for (j=0; j<boardTallyOne[i].length; j++) {
-                if (j === parseInt(secondIndex)) {
+                if (j === parseInt(currentY)) {
                     if (playerTurn === "One"){
                         boardTallyOne[i][j] = shipLetter;
                     }else{
@@ -271,8 +273,54 @@ var logSquares = function(event){
 }
 };
 
-var showBoth = function(){
+//phantom spaces on mouse over to show cells that player can place ships
+var phantom = function(event){
+    var self = event.target;
+    var x = parseInt(self.getAttribute("rowNo"));
+    var y = parseInt(self.getAttribute("colNo"));
+    this.style.backgroundColor = "#636161f5";
+    // if (shipsToPlace[0] === "Carrier"){
+    //     var squares = document.querySelectorAll("#mainboard .game-square");
+    //     for (i=0; i<squares.length; i++){
+    //         var cdn = [squares[i].getAttribute("rowNo"), squares[i].getAttribute("colNo")];
+    //         var firstIndex = cdn[0];
+    //         var secondIndex = cdn[1];
 
+    //         if ((parseInt(firstIndex) === parseInt(x) && parseInt(secondIndex) === parseInt(y + 1)) || (parseInt(firstIndex) === parseInt(x) && parseInt(secondIndex) === parseInt(y + 2)) || (parseInt(firstIndex) === parseInt(x) && parseInt(secondIndex) === parseInt(y - 1)) || (parseInt(firstIndex) === parseInt(x) && parseInt(secondIndex) === parseInt(y -2))){
+    //             squares[i].style.backgroundColor = "#636161f5";
+    //         }
+    //     }
+    // }
+}
+
+var phantomOut = function(event){
+    if (playerTurn === "One"){
+        this.style.backgroundColor = "#b4ebf5c2";
+    } else if (playerTurn === "Two"){
+        this.style.backgroundColor = "#fbdda5d9";
+    }
+}
+
+var legality = function(){
+    var cdn = [this.getAttribute("rowNo"), this.getAttribute("colNo")];
+    var firstIndex = cdn[0];
+    var secondIndex = cdn[1];
+    if((parseInt(firstIndex) === parseInt(currentX) && parseInt(secondIndex) === parseInt(+currentY + 1)) || (parseInt(firstIndex) === parseInt(currentX) && parseInt(secondIndex) === parseInt(currentY - 1)) || currentX === null && currentY === null){
+            //if legal, turn cell color to indicate that space has been taken and remove click event for that cell. Proceed to log square in board tally.
+            this.style.backgroundColor = "#f7e868";
+            this.removeEventListener("click", legality);
+            this.removeEventListener("mouseover", phantom);
+            this.removeEventListener("mouseout", phantomOut);
+            currentX = firstIndex;
+            currentY = secondIndex;
+            console.log("updated x and y are " + currentX + "and" + currentY);
+            logSquares();
+    }else{
+        alert("Please select a cell that is horizontally next to the previous selection.")
+    }
+}
+
+var showBoth = function(){
     container.style.backgroundImage = "url('pics/war.png')";
 
     for(i=0; i<2; i++){
@@ -462,7 +510,9 @@ var addParaToDisplay = function(msg){
 var addSquaresEvent = function() {
     var squaresTemp = document.querySelectorAll(".game-square");
         for (i=0; i<squaresTemp.length; i++){
-            squaresTemp[i].addEventListener("click",logSquares);
+            squaresTemp[i].addEventListener("click",legality);
+            squaresTemp[i].addEventListener("mouseover", phantom);
+            squaresTemp[i].addEventListener("mouseout", phantomOut);
         };
 };
 
