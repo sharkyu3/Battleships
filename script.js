@@ -10,11 +10,13 @@ var playerTwoWinCount = 0;
 var boom = new Audio('sounds/explode.mp3');
 var splash = new Audio('sounds/splash.mp3');
 var cheer = new Audio('sounds/cheers.mp3');
+var tada = new Audio('sounds/tada.mp3');
 
 var startButton = document.getElementById("start");
 var displayRow = document.getElementById("row2");
 var gameBoardRow = document.getElementById("gameboard-row");
 var container = document.querySelector(".container");
+var body = document.querySelector("body");
 
 var ships = [
     {
@@ -44,6 +46,10 @@ var ships = [
     }
 ];
 
+// var noOfSquaresToPlace = null;
+var shipLetter = null;
+var shipsToPlace = [];
+
 var carrierCells = 5;
 var battleshipCells = 4;
 var submarineCells = 3;
@@ -57,44 +63,6 @@ var submarineCells2 = 3;
 var destroyerCells2 = 3;
 var patrolCells2 = 2;
 var totalToDestroy2 = 17;
-
-var startGame = function(event){
-    startButton.remove();
-    //create input field to collect player names
-    var inputTemp = document.createElement("input");
-    inputTemp.setAttribute("id", "inputField");
-    inputTemp.setAttribute("placeholder", "Input Player 1's name");
-    displayRow.appendChild(inputTemp);
-    inputTemp.addEventListener("change", function(event){
-        if(playerOneName === null){
-            playerOneName = this.value.toUpperCase();
-            clearInput("Input Player 2's name");
-        }else{
-            playerTwoName = this.value.toUpperCase();
-            this.remove();
-            startCollatePlayerPositions();
-        }
-    });
-}
-
-var startCollatePlayerPositions = function(){
-    clearDisplay();
-    clearGameBoardRow();
-
-    var readyTemp = document.createElement("button");
-    if(playerTurn === "One"){
-        addParaToDisplay("Time for " + playerOneName + " to set your board!" + "\n" + "Click on the button below when you have the screen to yourself!");
-        readyTemp.textContent = playerOneName + " is ready!"
-    }else{
-        addParaToDisplay("Time for " + playerTwoName + " to set your board!" + "\n" + "Click on the button below when you have the screen to yourself!");
-        readyTemp.textContent = playerTwoName + " is ready!"
-    }
-    readyTemp.addEventListener("click", makeBoard);
-    readyTemp.addEventListener("click",fixBoats);
-    displayRow.appendChild(readyTemp);
-
-    fillShipsArray();
-}
 
 var boardTallyOne = [
 [null,null,null,null,null,null,null,null,null,null],
@@ -122,9 +90,51 @@ var boardTallyTwo = [
 [null,null,null,null,null,null,null,null,null,null],
 ];
 
+var currentX = null;
+var currentY = null;
+
+var startGame = function(event){
+    startButton.remove();
+    //create input field to collect player names
+    var inputTemp = document.createElement("input");
+    inputTemp.setAttribute("id", "inputField");
+    inputTemp.setAttribute("placeholder", "Input Player 1's name");
+    displayRow.appendChild(inputTemp);
+    inputTemp.addEventListener("change", function(event){
+        if(playerOneName === null){
+            playerOneName = this.value.toUpperCase();
+            clearInput("Input Player 2's name");
+        }else{
+            playerTwoName = this.value.toUpperCase();
+            this.remove();
+            startCollatePlayerPositions();
+        }
+    });
+}
+
+//Create gameboard
+var startCollatePlayerPositions = function(){
+    clearDisplay();
+    clearGameBoardRow();
+
+    var readyTemp = document.createElement("button");
+    if(playerTurn === "One"){
+        addParaToDisplay(playerOneName + "! Time to set your board!" + "\n" + "Click on the button below when you have the screen to yourself!");
+        readyTemp.textContent = playerOneName + " is ready!"
+    }else{
+        addParaToDisplay(playerTwoName + "! Time to set your board!" + "\n" + "Click on the button below when you have the screen to yourself!");
+        readyTemp.textContent = playerTwoName + " is ready!"
+    }
+    readyTemp.addEventListener("click", makeBoard);
+    readyTemp.addEventListener("click",fixBoats);
+    displayRow.appendChild(readyTemp);
+
+    fillShipsArray();
+}
+
+//To create displays
 var makeBoard = function(){
-    gameBoardRow.style.backgroundImage = 'none';
-    container.style.backgroundImage = "url('pics/warroom.jpg')";
+    body.style.backgroundImage = "url('pics/warroom.jpg')";
     var header = document.querySelector("h1");
     var para = document.getElementById("row2");
     header.style.color = "white";
@@ -195,133 +205,8 @@ var makeGrid = function(){
     gameBoardRow.appendChild(boardTemp);
 }
 
-var noOfSquaresToPlace = null;
-var shipLetter = null;
-
-var shipsToPlace = [];
-
-var fillShipsArray = function(){
-    //fill shipsToPlace array with the ship names
-    for(i=0; i<ships.length; i++){
-        shipsToPlace.push(ships[i].ShipName);
-    };
-};
-
-var fixBoats = function(){
-    if(shipsToPlace.length === 0){
-        if(playerTurn === "One"){
-            playerTurn = "Two";
-            clearGameBoardRow();
-            startCollatePlayerPositions();
-        }else{
-            playerTurn = "One";
-            clearDisplay();
-            clearGameBoardRow();
-            addParaToDisplay("MAN YOUR STATIONS!!!!!");
-            showBoth();
-            gamePlay();
-        };
-    }else{
-        for(j=0; j<ships.length; j++){
-        if (shipsToPlace[0] === ships[j].ShipName){
-            clearDisplay();
-            noOfSquaresToPlace = parseInt(ships[j].Squares);
-            shipLetter = ships[j].Sign;
-            var shipTemp = document.querySelector(".ship"+j);
-            shipTemp.style.border = "5px solid red";
-            addParaToDisplay("Let's place your " + ships[j].ShipName + " which requires " + noOfSquaresToPlace + " squares");
-            addSquaresEvent();
-            }
-        }
-    }
-}
-
-var currentX = null;
-var currentY = null;
-
-var logSquares = function(event){
-    clearDisplay();
-    noOfSquaresToPlace--;
-
-    if(noOfSquaresToPlace === -1){
-        removeSquaresEvent();
-        shipsToPlace.shift();
-        fixBoats();
-        currentX === null;
-        currentY === null;
-    }else if(noOfSquaresToPlace >= 0){
-    clearDisplay();
-    addParaToDisplay("You need to place " + noOfSquaresToPlace + " more squares for this vessel.")
-
-    //grab coordinates of cell and fill in array
-    // var cdn = [this.getAttribute("rowNo"), this.getAttribute("colNo")];
-    // var firstIndex = cdn[0];
-    // var secondIndex = cdn[1];
-    for (i=0; i<boardTallyOne.length; i++) {
-        if (i === parseInt(currentX)) {
-            for (j=0; j<boardTallyOne[i].length; j++) {
-                if (j === parseInt(currentY)) {
-                    if (playerTurn === "One"){
-                        boardTallyOne[i][j] = shipLetter;
-                    }else{
-                        boardTallyTwo[i][j] = shipLetter;
-                    }
-                }
-            }
-        }
-    }
-}
-};
-
-//phantom spaces on mouse over to show cells that player can place ships
-var phantom = function(event){
-    var self = event.target;
-    var x = parseInt(self.getAttribute("rowNo"));
-    var y = parseInt(self.getAttribute("colNo"));
-    this.style.backgroundColor = "#636161f5";
-    // if (shipsToPlace[0] === "Carrier"){
-    //     var squares = document.querySelectorAll("#mainboard .game-square");
-    //     for (i=0; i<squares.length; i++){
-    //         var cdn = [squares[i].getAttribute("rowNo"), squares[i].getAttribute("colNo")];
-    //         var firstIndex = cdn[0];
-    //         var secondIndex = cdn[1];
-
-    //         if ((parseInt(firstIndex) === parseInt(x) && parseInt(secondIndex) === parseInt(y + 1)) || (parseInt(firstIndex) === parseInt(x) && parseInt(secondIndex) === parseInt(y + 2)) || (parseInt(firstIndex) === parseInt(x) && parseInt(secondIndex) === parseInt(y - 1)) || (parseInt(firstIndex) === parseInt(x) && parseInt(secondIndex) === parseInt(y -2))){
-    //             squares[i].style.backgroundColor = "#636161f5";
-    //         }
-    //     }
-    // }
-}
-
-var phantomOut = function(event){
-    if (playerTurn === "One"){
-        this.style.backgroundColor = "#b4ebf5c2";
-    } else if (playerTurn === "Two"){
-        this.style.backgroundColor = "#fbdda5d9";
-    }
-}
-
-var legality = function(){
-    var cdn = [this.getAttribute("rowNo"), this.getAttribute("colNo")];
-    var firstIndex = cdn[0];
-    var secondIndex = cdn[1];
-    if((parseInt(firstIndex) === parseInt(currentX) && parseInt(secondIndex) === parseInt(+currentY + 1)) || (parseInt(firstIndex) === parseInt(currentX) && parseInt(secondIndex) === parseInt(currentY - 1)) || currentX === null && currentY === null){
-            //if legal, turn cell color to indicate that space has been taken and remove click event for that cell. Proceed to log square in board tally.
-            this.style.backgroundColor = "#f7e868";
-            this.removeEventListener("click", legality);
-            this.removeEventListener("mouseover", phantom);
-            this.removeEventListener("mouseout", phantomOut);
-            currentX = firstIndex;
-            currentY = secondIndex;
-            console.log("updated x and y are " + currentX + "and" + currentY);
-            logSquares();
-    }else{
-        alert("Please select a cell that is horizontally next to the previous selection.")
-    }
-}
-
 var showBoth = function(){
-    container.style.backgroundImage = "url('pics/war.png')";
+    body.style.backgroundImage = "url('pics/war.png')";
 
     for(i=0; i<2; i++){
         var tempRow = document.createElement("div");
@@ -359,6 +244,254 @@ var showBoth = function(){
     }
 }
 
+//phantom spaces on mouse over to show cells that player can place ships
+var phantom = function(event){
+    this.style.backgroundColor = "#636161f5";
+    var cdn = [this.getAttribute("rowNo"), this.getAttribute("colNo")];
+    var firstIndex = parseInt(cdn[0]);
+    var secondIndex = parseInt(cdn[1]);
+
+    var squaresTemp = document.querySelectorAll(".game-square");
+    for(i=0; i<squaresTemp.length; i++){
+        var cdn2 = [squaresTemp[i].getAttribute("rowNo"), squaresTemp[i].getAttribute("colNo")];
+        var firstIndexInner = parseInt(cdn2[0]);
+        var secondIndexInner = parseInt(cdn2[1]);
+        if(shipsToPlace[0]==="Carrier"){
+            if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex+2) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-2)){
+                squaresTemp[i].style.backgroundColor = "#636161f5";
+            }
+        }else if(shipsToPlace[0]==="Battleship"){
+            if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex+2) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1)){
+                squaresTemp[i].style.backgroundColor = "#636161f5";
+            }
+        }else if(shipsToPlace[0]==="Submarine" || shipsToPlace[0]==="Destroyer"){
+            if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1)){
+                squaresTemp[i].style.backgroundColor = "#636161f5";
+            }
+        }else if(shipsToPlace[0]==="Patrol Boat"){
+            if(firstIndexInner === firstIndex && secondIndexInner === secondIndex+1){
+                squaresTemp[i].style.backgroundColor = "#636161f5";
+            }
+        }
+    }
+}
+
+var phantomOut = function(event){
+    if (playerTurn === "One"){
+        this.style.backgroundColor = "#b4ebf5c2";
+    }else if (playerTurn === "Two"){
+        this.style.backgroundColor = "#fbdda5d9";
+    }
+        var cdn = [this.getAttribute("rowNo"), this.getAttribute("colNo")];
+        var firstIndex = parseInt(cdn[0]);
+        var secondIndex = parseInt(cdn[1]);
+        var squaresTemp = document.querySelectorAll(".game-square");
+
+        for(i=0; i<squaresTemp.length; i++){
+            var cdn2 = [squaresTemp[i].getAttribute("rowNo"), squaresTemp[i].getAttribute("colNo")];
+            var firstIndexInner = parseInt(cdn2[0]);
+            var secondIndexInner = parseInt(cdn2[1]);
+            if(shipsToPlace[0]==="Carrier"){
+                if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex+2) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-2)){
+                    if(playerTurn === "One"){
+                        squaresTemp[i].style.backgroundColor = "#b4ebf5c2";
+                    }else if (playerTurn === "Two"){
+                        squaresTemp[i].style.backgroundColor = "#fbdda5d9";
+                    }
+                }
+            }else if(shipsToPlace[0]==="Battleship"){
+                if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex+2) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1)){
+                    if(playerTurn === "One"){
+                        squaresTemp[i].style.backgroundColor = "#b4ebf5c2";
+                    }else if (playerTurn === "Two"){
+                        squaresTemp[i].style.backgroundColor = "#fbdda5d9";
+                    }
+                }
+            }else if(shipsToPlace[0]==="Submarine" || shipsToPlace[0] === "Destroyer"){
+                if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1)){
+                    if(playerTurn === "One"){
+                        squaresTemp[i].style.backgroundColor = "#b4ebf5c2";
+                    }else if (playerTurn === "Two"){
+                        squaresTemp[i].style.backgroundColor = "#fbdda5d9";
+                    }
+                }
+            }else if(shipsToPlace[0]==="Patrol Boat"){
+                if(firstIndexInner === firstIndex && secondIndexInner === secondIndex+1){
+                    if(playerTurn === "One"){
+                        squaresTemp[i].style.backgroundColor = "#b4ebf5c2";
+                    }else if (playerTurn === "Two"){
+                        squaresTemp[i].style.backgroundColor = "#fbdda5d9";
+                    }
+                }
+            }
+        }
+    }
+
+var fillShipsArray = function(){
+    //fill shipsToPlace array with the ship names
+    for(i=0; i<ships.length; i++){
+        shipsToPlace.push(ships[i].ShipName);
+    };
+};
+
+
+//Positioning of boats per player
+var fixBoats = function(){
+    console.log("inside fixboats. currents are " + currentX + currentY);
+    if(shipsToPlace.length === 0){
+        if(playerTurn === "One"){
+            playerTurn = "Two";
+            clearGameBoardRow();
+            startCollatePlayerPositions();
+        }else{
+            playerTurn = "One";
+            clearDisplay();
+            clearGameBoardRow();
+            addParaToDisplay("MAN YOUR STATIONS!!!!!");
+            showBoth();
+            gamePlay();
+        };
+    }else{
+        for(j=0; j<ships.length; j++){
+        if (shipsToPlace[0] === ships[j].ShipName){
+            clearDisplay();
+            // noOfSquaresToPlace = parseInt(ships[j].Squares);
+            shipLetter = ships[j].Sign;
+            var shipTemp = document.querySelector(".ship"+j);
+            shipTemp.style.border = "5px solid red";
+            addParaToDisplay("Let's place your " + ships[j].ShipName + " which requires " + ships[j].Squares + " squares");
+
+            var squares = document.querySelectorAll(".game-square");
+                for (i=0; i<squares.length; i++){
+                var cdn = [squares[i].getAttribute("rowNo"), squares[i].getAttribute("colNo")];
+                var firstIndex = cdn[0];
+                var secondIndex = cdn[1];
+
+                if(playerTurn === "One"){
+                    for (j=0;j<boardTallyOne.length; j++){
+                    if (j === parseInt(firstIndex)) {
+                        for (k=0; k<boardTallyOne[j].length; k++) {
+                            if (k === parseInt(secondIndex)) {
+                                if(boardTallyOne[j][k] === null){
+                                        squares[i].addEventListener("click", logSquares);
+                                        squares[i].addEventListener("mouseover", phantom);
+                                        squares[i].addEventListener("mouseout", phantomOut);
+                                    }
+                                }
+                            }
+                            }
+                        }
+                    }else if(playerTurn === "Two"){
+                        for (j=0;j<boardTallyTwo.length; j++){
+                        if (j === parseInt(firstIndex)) {
+                        for (k=0; k<boardTallyTwo[j].length; k++) {
+                            if (k === parseInt(secondIndex)) {
+                                if(boardTallyTwo[j][k] === null){
+                                        squares[i].addEventListener("click", logSquares);
+                                        squares[i].addEventListener("mouseover", phantom);
+                                        squares[i].addEventListener("mouseout", phantomOut);
+                                    }
+                                }
+                            }
+                        }
+                }
+                    }
+                }
+            }
+        }
+    }
+}
+
+var logSquares = function(event){
+    clearDisplay();
+    this.removeEventListener("click", logSquares);
+    this.removeEventListener("mouseover", phantom);
+    this.removeEventListener("mouseout", phantomOut);
+    this.style.backgroundColor = "#545454c2";
+    var cdn = [this.getAttribute("rowNo"), this.getAttribute("colNo")];
+    var firstIndex = parseInt(cdn[0]);
+    var secondIndex = parseInt(cdn[1]);
+
+    var squaresTemp = document.querySelectorAll(".game-square");
+    for(i=0; i<squaresTemp.length; i++){
+        var cdn2 = [squaresTemp[i].getAttribute("rowNo"), squaresTemp[i].getAttribute("colNo")];
+        var firstIndexInner = parseInt(cdn2[0]);
+        var secondIndexInner = parseInt(cdn2[1]);
+
+        if(shipsToPlace[0]==="Carrier"){
+            shipsToPlace.shift();
+            if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex+2) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-2)){
+                    squaresTemp[i].removeEventListener("click", logSquares);
+                    squaresTemp[i].removeEventListener("mouseover", phantom);
+                    squaresTemp[i].removeEventListener("mouseout", phantomOut);
+                    squaresTemp[i].style.backgroundColor = "#545454c2";
+                }
+            }
+            for(i=0; i<boardTallyOne.length; i++){
+                if(i === firstIndex){
+                    for (j=0; j<boardTallyOne[i].length; j++){
+                        if((j === secondIndex) || (j === secondIndex+1) || (j === secondIndex+2) || (j === secondIndex-1) || (j === secondIndex-2)){
+                            boardTallyOne[i][j]=shipLetter;
+                        }
+                    }
+        }else if (shipsToPlace[0] === "Battleship"){
+            shipsToPlace.shift();
+            if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex+2) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1)){
+                    squaresTemp[i].removeEventListener("click", logSquares);
+                    squaresTemp[i].removeEventListener("mouseover", phantom);
+                    squaresTemp[i].removeEventListener("mouseout", phantomOut);
+                    squaresTemp[i].style.backgroundColor = "#545454c2";
+                }
+            }
+            for(i=0; i<boardTallyOne.length; i++){
+                if(i === firstIndex){
+                    for (j=0; j<boardTallyOne[i].length; j++){
+                        if((j === secondIndex) || (j === secondIndex+1) || (j === secondIndex+2) || (j === secondIndex-1)){
+                            boardTallyOne[i][j]=shipLetter;
+                        }
+                    }
+        }else if (shipsToPlace[0] === "Submarine" || shipsToPlace[0] === "Destroyer"){
+            shipsToPlace.shift();
+            if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1)){
+                    squaresTemp[i].removeEventListener("click", logSquares);
+                    squaresTemp[i].removeEventListener("mouseover", phantom);
+                    squaresTemp[i].removeEventListener("mouseout", phantomOut);
+                    squaresTemp[i].style.backgroundColor = "#545454c2";
+                }
+            }
+            for(i=0; i<boardTallyOne.length; i++){
+                if(i === firstIndex){
+                    for (j=0; j<boardTallyOne[i].length; j++){
+                        if((j === secondIndex) || (j === secondIndex+1) || (j === secondIndex-1)){
+                            boardTallyOne[i][j]=shipLetter;
+                        }
+                    }
+        }else if (shipsToPlace[0] === "Patrol Boat"){
+            shipsToPlace.shift();
+            if(firstIndexInner === firstIndex && secondIndexInner === secondIndex+1){
+                    squaresTemp[i].removeEventListener("click", logSquares);
+                    squaresTemp[i].removeEventListener("mouseover", phantom);
+                    squaresTemp[i].removeEventListener("mouseout", phantomOut);
+                    squaresTemp[i].style.backgroundColor = "#545454c2";
+                }
+            }
+            for(i=0; i<boardTallyOne.length; i++){
+                if(i === firstIndex){
+                    for (j=0; j<boardTallyOne[i].length; j++){
+                        if((j === secondIndex) || (j === secondIndex+1)){
+                            boardTallyOne[i][j]=shipLetter;
+                        }
+                    }
+                }
+            }
+        }
+    }
+        }
+        fixboats();
+    }
+}
+
+//Player 1 VS Player 2
 var gamePlay = function(){
     if (playerTurn === "One"){
         clearDisplay();
@@ -416,7 +549,6 @@ var checkClick = function(){
     var cdn = [this.getAttribute("rowNo"), this.getAttribute("colNo")];
     var firstIndex = cdn[0];
     var secondIndex = cdn[1];
-
     if(playerTurn === "One"){
         for (i=0; i<boardTallyTwo.length; i++) {
             if (i === parseInt(firstIndex)) {
@@ -495,40 +627,6 @@ var checkClick = function(){
     checkForSink();
 }
 
-var clearDisplay = function(){
-    while (displayRow.firstChild){
-        displayRow.removeChild(displayRow.firstChild);
-    };
-};
-
-var addParaToDisplay = function(msg){
-    var paraTemp = document.createElement("p");
-    paraTemp.textContent = msg;
-    displayRow.appendChild(paraTemp);
-};
-
-var addSquaresEvent = function() {
-    var squaresTemp = document.querySelectorAll(".game-square");
-        for (i=0; i<squaresTemp.length; i++){
-            squaresTemp[i].addEventListener("click",legality);
-            squaresTemp[i].addEventListener("mouseover", phantom);
-            squaresTemp[i].addEventListener("mouseout", phantomOut);
-        };
-};
-
-var removeSquaresEvent = function() {
-    var squaresTemp = document.querySelectorAll(".game-square");
-        for (i=0; i<squaresTemp.length; i++){
-            squaresTemp[i].removeEventListener("click",logSquares);
-        };
-};
-
-var clearGameBoardRow = function(){
-    while (gameBoardRow.firstChild){
-        gameBoardRow.removeChild(gameBoardRow.firstChild);
-    };
-};
-
 var checkForSink = function(){
     if(playerTurn === "One"){
         playerTurn = "Two";
@@ -537,7 +635,7 @@ var checkForSink = function(){
             cheer.play();
             playerOneWinCount++;
             clearDisplay();
-            container.style.backgroundImage = "url('pics/sea.JPG')";
+            body.style.backgroundImage = "url('pics/sea.JPG')";
             replayGame();
         }else if(totalToDestroy2 > 0){
             if(carrierCells2 === 0){
@@ -565,7 +663,7 @@ var checkForSink = function(){
             cheer.play();
             playerTwoWinCount++;
             clearDisplay();
-            container.style.backgroundImage = "url('pics/sea.JPG')";
+            body.style.backgroundImage = "url('pics/sea.JPG')";
             replayGame();
         }else if (totalToDestroy > 0){
             if(carrierCells === 0){
@@ -588,6 +686,41 @@ var checkForSink = function(){
         }
     }
 }
+
+//global functions to use elsewhere
+var clearDisplay = function(){
+    while (displayRow.firstChild){
+        displayRow.removeChild(displayRow.firstChild);
+    };
+};
+
+var addParaToDisplay = function(msg){
+    var paraTemp = document.createElement("p");
+    paraTemp.textContent = msg;
+    displayRow.appendChild(paraTemp);
+};
+
+var addSquaresEvent = function() {
+    var squaresTemp = document.querySelectorAll(".game-square");
+        for (i=0; i<squaresTemp.length; i++){
+            squaresTemp[i].addEventListener("click",logSquares);
+            squaresTemp[i].addEventListener("mouseover", phantom);
+            squaresTemp[i].addEventListener("mouseout", phantomOut);
+        };
+};
+
+var removeSquaresEvent = function() {
+    var squaresTemp = document.querySelectorAll(".game-square");
+        for (i=0; i<squaresTemp.length; i++){
+            squaresTemp[i].removeEventListener("click",legality);
+        };
+};
+
+var clearGameBoardRow = function(){
+    while (gameBoardRow.firstChild){
+        gameBoardRow.removeChild(gameBoardRow.firstChild);
+    };
+};
 
 var replayGame = function(){
     playerTurn = "One";

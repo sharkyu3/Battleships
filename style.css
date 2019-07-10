@@ -1,13 +1,14 @@
 body{
 	font-family: 'Playfair Display', serif;
 	height: 100%;
-	background-image: "";
+	background-image: url('pics/test.jpg');
 }
 
 h1{
-	font-size:60px;
+	font-size:80px;
 	margin: 0 auto;
 	padding: 30px;
+	color: white;
 }
 
 button{
@@ -22,6 +23,8 @@ p{
 	font-size: 25px;
 	text-align: center;
 	margin-bottom: 15px;
+	color: white;
+	background-color: black;
 }
 
 #inputField{
@@ -37,7 +40,6 @@ p{
 	height:500px;
 	width:100%;
 	margin-top: 15px;
-	background-image: url("pics/fleet.jpg");
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-position: center;
@@ -139,6 +141,7 @@ p{
 #ack{
 	margin: 20px auto;
 	text-align: center;
+	color: white;
 }
 
 #start2{
