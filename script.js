@@ -206,7 +206,7 @@ var makeGrid = function(){
 }
 
 var showBoth = function(){
-    body.style.backgroundImage = "url('pics/war.png')";
+    body.style.backgroundImage = "url('pics/fleet.jpg')";
 
     for(i=0; i<2; i++){
         var tempRow = document.createElement("div");

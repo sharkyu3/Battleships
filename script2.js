@@ -324,7 +324,7 @@ var logSquares = function(event){
 // }
 
 var showBoth = function(){
-    body.style.backgroundImage = "url('pics/war.png')";
+    body.style.backgroundImage = "url('pics/storm.jpg')";
 
     for(i=0; i<2; i++){
         var tempRow = document.createElement("div");
@@ -366,6 +366,8 @@ var gamePlay = function(){
     if (playerTurn === "One"){
         clearDisplay();
         addParaToDisplay(playerOneName + "'s turn! Click on a cell on your opponent's grid.");
+        var paraTemp = document.querySelector("p");
+        paraTemp.style.backgroundColor = "none";
         var squares = document.querySelectorAll("#mainboard0 .game-square");
         for (i=0;i<squares.length; i++){
             squares[i].removeEventListener("click", checkClick);
