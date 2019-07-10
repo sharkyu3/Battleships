@@ -142,7 +142,7 @@ var makeBoard = function(){
     var para = document.getElementById("row2");
     header.style.color = "white";
     para.style.color = "white";
-
+    body.addEventListener("keydown", orientationChange);
     //create left display to show ships available for placement
     var leftDisplay = document.createElement("div");
     leftDisplay.setAttribute("class", "col-3");
@@ -180,11 +180,6 @@ var makeBoard = function(){
         };
     }
     addSquaresEvent();
-    body.addEventListener("keydown", function(event){
-        if(event.which === 32){
-            orientation = "vertical";
-        }
-    })
 }
 
 var makeGrid = function(){
@@ -366,11 +361,10 @@ var fillShipsArray = function(){
     };
 };
 
-
 //Positioning of boats per player
 var fixBoats = function(){
-    orientation = "horizontal";
     if(shipsToPlace.length === 0){
+        assignTreasure();
         if(playerTurn === "One"){
             playerTurn = "Two";
             console.log("player turn is now " + playerTurn);
@@ -468,7 +462,7 @@ var gamePlay = function(){
             if (j === parseInt(firstIndex)) {
                 for (k=0; k<boardTallyTwo[j].length; k++) {
                     if (k === parseInt(secondIndex)) {
-                        if(boardTallyTwo[j][k] === "C" || boardTallyTwo[j][k] === "B" || boardTallyTwo[j][k] === "S" || boardTallyTwo[j][k] === "D" || boardTallyTwo[j][k] === "P" || boardTallyTwo[j][k] === null){
+                        if(boardTallyTwo[j][k] === "C" || boardTallyTwo[j][k] === "B" || boardTallyTwo[j][k] === "S" || boardTallyTwo[j][k] === "D" || boardTallyTwo[j][k] === "P" || boardTallyTwo[j][k] === "T" || boardTallyTwo[j][k] === null){
                             squares1[i].addEventListener("click", checkClick);
                         }
                     }
@@ -492,7 +486,7 @@ var gamePlay = function(){
             if (j === parseInt(firstIndex)) {
                 for (k=0; k<boardTallyOne[j].length; k++) {
                     if (k === parseInt(secondIndex)) {
-                        if(boardTallyOne[j][k] === "C" || boardTallyOne[j][k] === "B" || boardTallyOne[j][k] === "S" || boardTallyOne[j][k] === "D" || boardTallyOne[j][k] === "P" || boardTallyOne[j][k] === null){
+                        if(boardTallyOne[j][k] === "C" || boardTallyOne[j][k] === "B" || boardTallyOne[j][k] === "S" || boardTallyOne[j][k] === "D" || boardTallyOne[j][k] === "P" || boardTallyOne[j][k] === "T" || boardTallyOne[j][k] === null){
                             squares1[i].addEventListener("click", checkClick);
                         }
                         }
@@ -539,11 +533,14 @@ var checkClick = function(){
                             boardTallyTwo[i][j] = "X";
                             this.style.backgroundImage = "url('pics/splash.png')";
                             splash.play();
+                        }else if (boardTallyTwo[i][j] === "T"){
+                            this.style.backgroundImage = "url('pics/treasure.png')";
+                            tada.play();
+                        }
                     }
                 }
             }
         }
-    }
     }else if(playerTurn === "Two"){
         for (i=0; i<boardTallyOne.length; i++) {
             if (i === parseInt(firstIndex)) {
@@ -576,12 +573,16 @@ var checkClick = function(){
                             boardTallyOne[i][j] = "X";
                             this.style.backgroundImage = "url('pics/splash.png')";
                             splash.play();
+                        }else if (boardTallyOne[i][j] === "T"){
+                            boardTallyOne[i][j] = "X";
+                            this.style.backgroundImage = "url('pics/treasure.png')";
+                            tada.play();
+                        }
                     }
                 }
             }
         }
     }
-}
     checkForSink();
 }
 
@@ -728,6 +729,53 @@ var checkConsiders = function(){
 var clearTruthCheck = function(){
     truthCheck = [];
     isItOk = null;
+}
+
+var orientationChange = function(event){
+    if(event.which === 32){
+        if(orientation === "horizontal"){
+            orientation = "vertical";
+        }else if (orientation === "vertical") {
+            orientation = "horizontal";
+        }
+    }
+}
+
+var assignTreasure = function(){
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+    };
+    var rowIndex = getRandomInt(10);
+    var colIndex = getRandomInt(10);
+    if (playerTurn === "One"){
+        for(i=0; i<parseInt(boardTallyOne.length); i++){
+            if(i === rowIndex){
+                for(j=0; j<parseInt(boardTallyOne[i].length); j++){
+                    if(j === colIndex){
+                        if(boardTallyOne[i][j] === null){
+                            boardTallyOne[i][j] = "T";
+                        }else{
+                            assignTreasure();
+                        }
+                    }
+                }
+            }
+        }
+    }else if (playerTurn === "Two"){
+        for(i=0; i<parseInt(boardTallyTwo.length); i++){
+            if(i === rowIndex){
+                for(j=0; j<parseInt(boardTallyTwo[i].length); j++){
+                    if(j === colIndex){
+                        if(boardTallyTwo[i][j] === null){
+                            boardTallyTwo[i][j] = "T";
+                        }else{
+                            assignTreasure();
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 var replayGame = function(){
