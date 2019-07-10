@@ -92,6 +92,8 @@ var boardTallyTwo = [
 
 var currentX = null;
 var currentY = null;
+var truthCheck = [];
+var isItOk = null;
 
 var startGame = function(event){
     startButton.remove();
@@ -176,6 +178,7 @@ var makeBoard = function(){
             squaresTemp[i].style.backgroundColor = "#fbdda5d9";
         };
     }
+    addSquaresEvent();
 }
 
 var makeGrid = function(){
@@ -191,7 +194,7 @@ var makeGrid = function(){
     //create button class = game-square x10 per row
         for (j=0;j<gridSize; j++){
         var cellTemp = document.createElement("div");
-        cellTemp.setAttribute("class","game-square");
+        cellTemp.classList.add("game-square","unset");
         //set additional attributes to mark coordinates of cell
         cellTemp.setAttribute("rowNo", i);
         cellTemp.setAttribute("colNo", j);
@@ -206,7 +209,7 @@ var makeGrid = function(){
 }
 
 var showBoth = function(){
-    body.style.backgroundImage = "url('pics/fleet.jpg')";
+    body.style.backgroundImage = "url('pics/storm.jpg')";
 
     for(i=0; i<2; i++){
         var tempRow = document.createElement("div");
@@ -246,85 +249,92 @@ var showBoth = function(){
 
 //phantom spaces on mouse over to show cells that player can place ships
 var phantom = function(event){
-    this.style.backgroundColor = "#636161f5";
-    var cdn = [this.getAttribute("rowNo"), this.getAttribute("colNo")];
-    var firstIndex = parseInt(cdn[0]);
-    var secondIndex = parseInt(cdn[1]);
+    this.classList.add("consider");
 
+    if(playerTurn === "One"){
+        if(boardTallyOne[currentX][currentY] === null){
+            this.style.backgroundColor = "#636161f5";
+    }else if (playerTurn === "Two"){
+        if(boardTallyTwo[currentX][currentY] === null){
+            this.style.backgroundColor = "#636161f5";
+        }
+    }
+}
     var squaresTemp = document.querySelectorAll(".game-square");
     for(i=0; i<squaresTemp.length; i++){
-        var cdn2 = [squaresTemp[i].getAttribute("rowNo"), squaresTemp[i].getAttribute("colNo")];
-        var firstIndexInner = parseInt(cdn2[0]);
-        var secondIndexInner = parseInt(cdn2[1]);
+    var cdn2 = [squaresTemp[i].getAttribute("rowNo"), squaresTemp[i].getAttribute("colNo")];
+    var firstIndexInner = parseInt(cdn2[0]);
+    var secondIndexInner = parseInt(cdn2[1]);
         if(shipsToPlace[0]==="Carrier"){
-            if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex+2) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-2)){
-                squaresTemp[i].style.backgroundColor = "#636161f5";
+            if((firstIndexInner === currentX && secondIndexInner === currentY+1) || (firstIndexInner === currentX && secondIndexInner === currentY+2) || (firstIndexInner === currentX && secondIndexInner === currentY-1) || (firstIndexInner === currentX && secondIndexInner === currentY-2)){
+                squaresTemp[i].classList.add("consider");
             }
         }else if(shipsToPlace[0]==="Battleship"){
-            if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex+2) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1)){
-                squaresTemp[i].style.backgroundColor = "#636161f5";
+            if((firstIndexInner === currentX && secondIndexInner === currentY+1) || (firstIndexInner === currentX && secondIndexInner === currentY+2) || (firstIndexInner === currentX && secondIndexInner === currentY-1)){
+                squaresTemp[i].classList.add("consider");
             }
-        }else if(shipsToPlace[0]==="Submarine" || shipsToPlace[0]==="Destroyer"){
-            if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1)){
-                squaresTemp[i].style.backgroundColor = "#636161f5";
+        }else if (shipsToPlace[0]==="Submarine" || shipsToPlace[0]==="Destroyer"){
+            if((firstIndexInner === currentX && secondIndexInner === currentY+1) || (firstIndexInner === currentX && secondIndexInner === currentY-1)){
+                squaresTemp[i].classList.add("consider");
             }
-        }else if(shipsToPlace[0]==="Patrol Boat"){
-            if(firstIndexInner === firstIndex && secondIndexInner === secondIndex+1){
-                squaresTemp[i].style.backgroundColor = "#636161f5";
+        }else if (shipsToPlace[0]==="Patrol Boat"){
+            if(firstIndexInner === currentX && secondIndexInner === currentY+1){
+                squaresTemp[i].classList.add("consider");
             }
+        }
+    }
+    checkConsiders();
+    var cellsBeingConsidered = document.querySelectorAll(".consider");
+    for(i=0; i<cellsBeingConsidered.length; i++){
+        if (isItOk === "Yes"){
+            cellsBeingConsidered[i].style.backgroundColor = "#636161f5";
+        }else{
+            cellsBeingConsidered[i].style.backgroundColor = "red";
+            this.style.backgroundColor = "red";
+            this.removeEventListener("click", logSquares);
         }
     }
 }
 
-var phantomOut = function(event){
-    if (playerTurn === "One"){
-        this.style.backgroundColor = "#b4ebf5c2";
-    }else if (playerTurn === "Two"){
-        this.style.backgroundColor = "#fbdda5d9";
-    }
-        var cdn = [this.getAttribute("rowNo"), this.getAttribute("colNo")];
-        var firstIndex = parseInt(cdn[0]);
-        var secondIndex = parseInt(cdn[1]);
-        var squaresTemp = document.querySelectorAll(".game-square");
 
-        for(i=0; i<squaresTemp.length; i++){
-            var cdn2 = [squaresTemp[i].getAttribute("rowNo"), squaresTemp[i].getAttribute("colNo")];
-            var firstIndexInner = parseInt(cdn2[0]);
-            var secondIndexInner = parseInt(cdn2[1]);
-            if(shipsToPlace[0]==="Carrier"){
-                if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex+2) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-2)){
-                    if(playerTurn === "One"){
-                        squaresTemp[i].style.backgroundColor = "#b4ebf5c2";
-                    }else if (playerTurn === "Two"){
-                        squaresTemp[i].style.backgroundColor = "#fbdda5d9";
+var phantomOut = function(event){
+    var cellsBeingConsidered = document.querySelectorAll(".consider");
+        for(i=0; i<cellsBeingConsidered.length; i++){
+            cellsBeingConsidered[i].classList.remove("consider");
+            var cdn = [cellsBeingConsidered[i].getAttribute("rowNo"), cellsBeingConsidered[i].getAttribute("colNo")];
+            var rowIndex = parseInt(cdn[0]);
+            var colIndex = parseInt(cdn[1]);
+            if(playerTurn === "One"){
+                for(j=0; j<boardTallyOne.length; j++){
+                    if(j === rowIndex){
+                        for (k=0; k<boardTallyOne[j].length; k++){
+                            if(k === colIndex){
+                                if (boardTallyOne[j][k] !== null){
+                                    cellsBeingConsidered[i].style.backgroundColor = "#ffeb3b"
+                                }else{
+                                    cellsBeingConsidered[i].style.backgroundColor = "#b4ebf5c2";
+                                }
+                            }
+                        }
                     }
                 }
-            }else if(shipsToPlace[0]==="Battleship"){
-                if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex+2) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1)){
-                    if(playerTurn === "One"){
-                        squaresTemp[i].style.backgroundColor = "#b4ebf5c2";
-                    }else if (playerTurn === "Two"){
-                        squaresTemp[i].style.backgroundColor = "#fbdda5d9";
-                    }
-                }
-            }else if(shipsToPlace[0]==="Submarine" || shipsToPlace[0] === "Destroyer"){
-                if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1)){
-                    if(playerTurn === "One"){
-                        squaresTemp[i].style.backgroundColor = "#b4ebf5c2";
-                    }else if (playerTurn === "Two"){
-                        squaresTemp[i].style.backgroundColor = "#fbdda5d9";
-                    }
-                }
-            }else if(shipsToPlace[0]==="Patrol Boat"){
-                if(firstIndexInner === firstIndex && secondIndexInner === secondIndex+1){
-                    if(playerTurn === "One"){
-                        squaresTemp[i].style.backgroundColor = "#b4ebf5c2";
-                    }else if (playerTurn === "Two"){
-                        squaresTemp[i].style.backgroundColor = "#fbdda5d9";
+            }else if (playerTurn === "Two"){
+                for(j=0; j<boardTallyTwo.length; j++){
+                    if(j === rowIndex){
+                        for (k=0; k<boardTallyTwo[j].length; k++){
+                            if(k === colIndex){
+                                if (boardTallyTwo[j][k] !== null){
+                                    cellsBeingConsidered[i].style.backgroundColor = "#ffeb3b"
+                                }else{
+                                    cellsBeingConsidered[i].style.backgroundColor = "#fbdda5d9";
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
+        clearTruthCheck();
     }
 
 var fillShipsArray = function(){
@@ -337,10 +347,10 @@ var fillShipsArray = function(){
 
 //Positioning of boats per player
 var fixBoats = function(){
-    console.log("inside fixboats. currents are " + currentX + currentY);
     if(shipsToPlace.length === 0){
         if(playerTurn === "One"){
             playerTurn = "Two";
+            console.log("player turn is now " + playerTurn);
             clearGameBoardRow();
             startCollatePlayerPositions();
         }else{
@@ -355,141 +365,66 @@ var fixBoats = function(){
         for(j=0; j<ships.length; j++){
         if (shipsToPlace[0] === ships[j].ShipName){
             clearDisplay();
-            // noOfSquaresToPlace = parseInt(ships[j].Squares);
             shipLetter = ships[j].Sign;
             var shipTemp = document.querySelector(".ship"+j);
             shipTemp.style.border = "5px solid red";
-            addParaToDisplay("Let's place your " + ships[j].ShipName + " which requires " + ships[j].Squares + " squares");
+            addParaToDisplay("Let's place your " + ships[j].ShipName);
 
-            var squares = document.querySelectorAll(".game-square");
-                for (i=0; i<squares.length; i++){
-                var cdn = [squares[i].getAttribute("rowNo"), squares[i].getAttribute("colNo")];
-                var firstIndex = cdn[0];
-                var secondIndex = cdn[1];
-
-                if(playerTurn === "One"){
-                    for (j=0;j<boardTallyOne.length; j++){
-                    if (j === parseInt(firstIndex)) {
-                        for (k=0; k<boardTallyOne[j].length; k++) {
-                            if (k === parseInt(secondIndex)) {
-                                if(boardTallyOne[j][k] === null){
-                                        squares[i].addEventListener("click", logSquares);
-                                        squares[i].addEventListener("mouseover", phantom);
-                                        squares[i].addEventListener("mouseout", phantomOut);
-                                    }
-                                }
-                            }
-                            }
-                        }
-                    }else if(playerTurn === "Two"){
-                        for (j=0;j<boardTallyTwo.length; j++){
-                        if (j === parseInt(firstIndex)) {
-                        for (k=0; k<boardTallyTwo[j].length; k++) {
-                            if (k === parseInt(secondIndex)) {
-                                if(boardTallyTwo[j][k] === null){
-                                        squares[i].addEventListener("click", logSquares);
-                                        squares[i].addEventListener("mouseover", phantom);
-                                        squares[i].addEventListener("mouseout", phantomOut);
-                                    }
-                                }
-                            }
-                        }
-                }
-                    }
-                }
+            var cellsUnset = document.querySelectorAll(".unset");
+            for(i=0; i<cellsUnset.length; i++){
+                cellsUnset[i].addEventListener("click", logSquares);
+                cellsUnset[i].addEventListener("mouseover", phantom);
+                cellsUnset[i].addEventListener("mouseout", phantomOut);
             }
         }
     }
+}
 }
 
 var logSquares = function(event){
     clearDisplay();
-    this.removeEventListener("click", logSquares);
-    this.removeEventListener("mouseover", phantom);
-    this.removeEventListener("mouseout", phantomOut);
-    this.style.backgroundColor = "#545454c2";
-    var cdn = [this.getAttribute("rowNo"), this.getAttribute("colNo")];
-    var firstIndex = parseInt(cdn[0]);
-    var secondIndex = parseInt(cdn[1]);
+    var cellsBeingConsidered = document.querySelectorAll(".consider");
+        for(i=0; i<cellsBeingConsidered.length; i++){
+            cellsBeingConsidered[i].classList.remove("consider", "unset");
+            cellsBeingConsidered[i].classList.add("set");
+            cellsBeingConsidered[i].style.backgroundColor = "#ffeb3b";
+            var cdn = [cellsBeingConsidered[i].getAttribute("rowNo"), cellsBeingConsidered[i].getAttribute("colNo")];
+            var rowIndex = parseInt(cdn[0]);
+            var colIndex = parseInt(cdn[1]);
 
-    var squaresTemp = document.querySelectorAll(".game-square");
-    for(i=0; i<squaresTemp.length; i++){
-        var cdn2 = [squaresTemp[i].getAttribute("rowNo"), squaresTemp[i].getAttribute("colNo")];
-        var firstIndexInner = parseInt(cdn2[0]);
-        var secondIndexInner = parseInt(cdn2[1]);
-
-        if(shipsToPlace[0]==="Carrier"){
-            shipsToPlace.shift();
-            if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex+2) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-2)){
-                    squaresTemp[i].removeEventListener("click", logSquares);
-                    squaresTemp[i].removeEventListener("mouseover", phantom);
-                    squaresTemp[i].removeEventListener("mouseout", phantomOut);
-                    squaresTemp[i].style.backgroundColor = "#545454c2";
-                }
-            }
-            for(i=0; i<boardTallyOne.length; i++){
-                if(i === firstIndex){
-                    for (j=0; j<boardTallyOne[i].length; j++){
-                        if((j === secondIndex) || (j === secondIndex+1) || (j === secondIndex+2) || (j === secondIndex-1) || (j === secondIndex-2)){
-                            boardTallyOne[i][j]=shipLetter;
+            if (playerTurn === "One"){
+                for (j=0; j<boardTallyOne.length; j++){
+                    if(j === rowIndex){
+                        for(k=0; k<boardTallyOne[i].length; k++){
+                            if (k === colIndex){
+                                for(l=0; l<ships.length; l++){
+                                    if (shipsToPlace[0] === ships[l].ShipName){
+                                        boardTallyOne[j][k] = ships[l].Sign;
+                                    }
+                                }
+                            }
                         }
                     }
-        }else if (shipsToPlace[0] === "Battleship"){
-            shipsToPlace.shift();
-            if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex+2) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1)){
-                    squaresTemp[i].removeEventListener("click", logSquares);
-                    squaresTemp[i].removeEventListener("mouseover", phantom);
-                    squaresTemp[i].removeEventListener("mouseout", phantomOut);
-                    squaresTemp[i].style.backgroundColor = "#545454c2";
                 }
-            }
-            for(i=0; i<boardTallyOne.length; i++){
-                if(i === firstIndex){
-                    for (j=0; j<boardTallyOne[i].length; j++){
-                        if((j === secondIndex) || (j === secondIndex+1) || (j === secondIndex+2) || (j === secondIndex-1)){
-                            boardTallyOne[i][j]=shipLetter;
-                        }
-                    }
-        }else if (shipsToPlace[0] === "Submarine" || shipsToPlace[0] === "Destroyer"){
-            shipsToPlace.shift();
-            if((firstIndexInner === firstIndex && secondIndexInner === secondIndex+1) || (firstIndexInner === firstIndex && secondIndexInner === secondIndex-1)){
-                    squaresTemp[i].removeEventListener("click", logSquares);
-                    squaresTemp[i].removeEventListener("mouseover", phantom);
-                    squaresTemp[i].removeEventListener("mouseout", phantomOut);
-                    squaresTemp[i].style.backgroundColor = "#545454c2";
-                }
-            }
-            for(i=0; i<boardTallyOne.length; i++){
-                if(i === firstIndex){
-                    for (j=0; j<boardTallyOne[i].length; j++){
-                        if((j === secondIndex) || (j === secondIndex+1) || (j === secondIndex-1)){
-                            boardTallyOne[i][j]=shipLetter;
-                        }
-                    }
-        }else if (shipsToPlace[0] === "Patrol Boat"){
-            shipsToPlace.shift();
-            if(firstIndexInner === firstIndex && secondIndexInner === secondIndex+1){
-                    squaresTemp[i].removeEventListener("click", logSquares);
-                    squaresTemp[i].removeEventListener("mouseover", phantom);
-                    squaresTemp[i].removeEventListener("mouseout", phantomOut);
-                    squaresTemp[i].style.backgroundColor = "#545454c2";
-                }
-            }
-            for(i=0; i<boardTallyOne.length; i++){
-                if(i === firstIndex){
-                    for (j=0; j<boardTallyOne[i].length; j++){
-                        if((j === secondIndex) || (j === secondIndex+1)){
-                            boardTallyOne[i][j]=shipLetter;
+            }else if (playerTurn === "Two"){
+                for (j=0; j<boardTallyTwo.length; j++){
+                    if(j === rowIndex){
+                        for(k=0; k<boardTallyTwo[i].length; k++){
+                            if (k === colIndex){
+                                for(l=0; l<ships.length; l++){
+                                    if (shipsToPlace[0] === ships[l].ShipName){
+                                        boardTallyTwo[j][k] = ships[l].Sign;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
         }
+        shipsToPlace.shift();
+        fixBoats();
     }
-        }
-        fixboats();
-    }
-}
 
 //Player 1 VS Player 2
 var gamePlay = function(){
@@ -703,6 +638,8 @@ var addParaToDisplay = function(msg){
 var addSquaresEvent = function() {
     var squaresTemp = document.querySelectorAll(".game-square");
         for (i=0; i<squaresTemp.length; i++){
+            squaresTemp[i].addEventListener("mouseover", getCellCoordinates);
+            squaresTemp[i].addEventListener("click", getCellCoordinates);
             squaresTemp[i].addEventListener("click",logSquares);
             squaresTemp[i].addEventListener("mouseover", phantom);
             squaresTemp[i].addEventListener("mouseout", phantomOut);
@@ -721,6 +658,54 @@ var clearGameBoardRow = function(){
         gameBoardRow.removeChild(gameBoardRow.firstChild);
     };
 };
+
+var getCellCoordinates = function(event){
+    var cdn = [this.getAttribute("rowNo"), this.getAttribute("colNo")];
+    var firstIndex = parseInt(cdn[0]);
+    var secondIndex = parseInt(cdn[1]);
+    currentX = firstIndex;
+    currentY = secondIndex;
+}
+
+var checkConsiders = function(){
+    var cellsBeingConsidered = document.querySelectorAll(".consider");
+
+    for (j=0; j<ships.length; j++){
+        if(shipsToPlace[0] === ships[j].ShipName && parseInt(cellsBeingConsidered.length) === ships[j].Squares){
+            for(i=0; i<cellsBeingConsidered.length; i++){
+                var cdn = [cellsBeingConsidered[i].getAttribute("rowNo"), cellsBeingConsidered[i].getAttribute("colNo")];
+                var rowIndex = parseInt(cdn[0]);
+                var colIndex = parseInt(cdn[1]);
+
+                if (playerTurn === "One"){
+                    if(boardTallyOne[rowIndex][colIndex] === null){
+                        truthCheck.push("true");
+                    }else{
+                        truthCheck.push("false");
+                    }
+                }else if (playerTurn === "Two"){
+                    if(boardTallyTwo[rowIndex][colIndex] === null){
+                        truthCheck.push("true");
+                    }else{
+                        truthCheck.push("false");
+                    }
+                }
+            }
+            if(truthCheck.includes("false")){
+                isItOk = "No";
+            }else{
+                isItOk = "Yes";
+            }
+        }else if (shipsToPlace[0] === ships[j].ShipName && parseInt(cellsBeingConsidered.length) !== ships[j].Squares){
+            isItOk = "No";
+        }
+    }
+}
+
+var clearTruthCheck = function(){
+    truthCheck = [];
+    isItOk = null;
+}
 
 var replayGame = function(){
     playerTurn = "One";
