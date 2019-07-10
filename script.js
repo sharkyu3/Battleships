@@ -94,6 +94,7 @@ var currentX = null;
 var currentY = null;
 var truthCheck = [];
 var isItOk = null;
+var orientation = "horizontal";
 
 var startGame = function(event){
     startButton.remove();
@@ -179,6 +180,11 @@ var makeBoard = function(){
         };
     }
     addSquaresEvent();
+    body.addEventListener("keydown", function(event){
+        if(event.which === 32){
+            orientation = "vertical";
+        }
+    })
 }
 
 var makeGrid = function(){
@@ -265,20 +271,36 @@ var phantom = function(event){
     var cdn2 = [squaresTemp[i].getAttribute("rowNo"), squaresTemp[i].getAttribute("colNo")];
     var firstIndexInner = parseInt(cdn2[0]);
     var secondIndexInner = parseInt(cdn2[1]);
-        if(shipsToPlace[0]==="Carrier"){
+        if(shipsToPlace[0]==="Carrier" && orientation === "horizontal"){
             if((firstIndexInner === currentX && secondIndexInner === currentY+1) || (firstIndexInner === currentX && secondIndexInner === currentY+2) || (firstIndexInner === currentX && secondIndexInner === currentY-1) || (firstIndexInner === currentX && secondIndexInner === currentY-2)){
                 squaresTemp[i].classList.add("consider");
             }
-        }else if(shipsToPlace[0]==="Battleship"){
+        }else if(shipsToPlace[0]==="Battleship" && orientation === "horizontal"){
             if((firstIndexInner === currentX && secondIndexInner === currentY+1) || (firstIndexInner === currentX && secondIndexInner === currentY+2) || (firstIndexInner === currentX && secondIndexInner === currentY-1)){
                 squaresTemp[i].classList.add("consider");
             }
-        }else if (shipsToPlace[0]==="Submarine" || shipsToPlace[0]==="Destroyer"){
+        }else if ((shipsToPlace[0]==="Submarine"  && orientation === "horizontal") || (shipsToPlace[0]==="Destroyer" && orientation === "horizontal")){
             if((firstIndexInner === currentX && secondIndexInner === currentY+1) || (firstIndexInner === currentX && secondIndexInner === currentY-1)){
                 squaresTemp[i].classList.add("consider");
             }
-        }else if (shipsToPlace[0]==="Patrol Boat"){
+        }else if (shipsToPlace[0]==="Patrol Boat" && orientation === "horizontal"){
             if(firstIndexInner === currentX && secondIndexInner === currentY+1){
+                squaresTemp[i].classList.add("consider");
+            }
+        }else if(shipsToPlace[0]==="Carrier" && orientation === "vertical"){
+            if((firstIndexInner === currentX+1 && secondIndexInner === currentY) || (firstIndexInner === currentX+2 && secondIndexInner === currentY) || (firstIndexInner === currentX-1 && secondIndexInner === currentY) || (firstIndexInner === currentX-2 && secondIndexInner === currentY)){
+                squaresTemp[i].classList.add("consider");
+            }
+        }else if(shipsToPlace[0]==="Battleship" && orientation === "vertical"){
+            if((firstIndexInner === currentX+1 && secondIndexInner === currentY) || (firstIndexInner === currentX+2 && secondIndexInner === currentY) || (firstIndexInner === currentX-1 && secondIndexInner === currentY)){
+                squaresTemp[i].classList.add("consider");
+            }
+        }else if ((shipsToPlace[0]==="Submarine"  && orientation === "vertical") || (shipsToPlace[0]==="Destroyer" && orientation === "vertical")){
+            if((firstIndexInner === currentX+1 && secondIndexInner === currentY) || (firstIndexInner === currentX-1 && secondIndexInner === currentY)){
+                squaresTemp[i].classList.add("consider");
+            }
+        }else if (shipsToPlace[0]==="Patrol Boat" && orientation === "vertical"){
+            if(firstIndexInner === currentX+1 && secondIndexInner === currentY){
                 squaresTemp[i].classList.add("consider");
             }
         }
@@ -347,6 +369,7 @@ var fillShipsArray = function(){
 
 //Positioning of boats per player
 var fixBoats = function(){
+    orientation = "horizontal";
     if(shipsToPlace.length === 0){
         if(playerTurn === "One"){
             playerTurn = "Two";
