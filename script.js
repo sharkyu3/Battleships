@@ -6,6 +6,11 @@ var playerTwoName = null;
 var playerTurn = "One";
 var playerOneWinCount = 0;
 var playerTwoWinCount = 0;
+var treasureNum1 = null;
+var treasureNum2 = null;
+var treasureArray = ["TORPEDO", "RAIN OF FIRE", "PEEK"]
+var treasure1 = null;
+var treasure2 = null;
 
 var boom = new Audio('sounds/explode.mp3');
 var splash = new Audio('sounds/splash.mp3');
@@ -122,10 +127,10 @@ var startCollatePlayerPositions = function(){
 
     var readyTemp = document.createElement("button");
     if(playerTurn === "One"){
-        addParaToDisplay(playerOneName + "! Time to set your board!" + "\n" + "Click on the button below when you have the screen to yourself!");
+        addParaToDisplay(playerOneName + "! Click on the button below when you have the screen to yourself!");
         readyTemp.textContent = playerOneName + " is ready!"
     }else{
-        addParaToDisplay(playerTwoName + "! Time to set your board!" + "\n" + "Click on the button below when you have the screen to yourself!");
+        addParaToDisplay(playerTwoName + "! Click on the button below when you have the screen to yourself!");
         readyTemp.textContent = playerTwoName + " is ready!"
     }
     readyTemp.addEventListener("click", makeBoard);
@@ -137,11 +142,9 @@ var startCollatePlayerPositions = function(){
 
 //To create displays
 var makeBoard = function(){
-    body.style.backgroundImage = "url('pics/warroom.jpg')";
+    body.style.backgroundImage = "none";
     var header = document.querySelector("h1");
     var para = document.getElementById("row2");
-    header.style.color = "white";
-    para.style.color = "white";
     body.addEventListener("keydown", orientationChange);
     //create left display to show ships available for placement
     var leftDisplay = document.createElement("div");
@@ -210,7 +213,7 @@ var makeGrid = function(){
 }
 
 var showBoth = function(){
-    body.style.backgroundImage = "url('pics/storm.jpg')";
+    body.classList.add("gradient");
 
     for(i=0; i<2; i++){
         var tempRow = document.createElement("div");
@@ -313,7 +316,6 @@ var phantom = function(event){
     }
 }
 
-
 var phantomOut = function(event){
     var cellsBeingConsidered = document.querySelectorAll(".consider");
         for(i=0; i<cellsBeingConsidered.length; i++){
@@ -372,9 +374,7 @@ var fixBoats = function(){
             startCollatePlayerPositions();
         }else{
             playerTurn = "One";
-            clearDisplay();
             clearGameBoardRow();
-            addParaToDisplay("MAN YOUR STATIONS!!!!!");
             showBoth();
             gamePlay();
         };
@@ -385,7 +385,7 @@ var fixBoats = function(){
             shipLetter = ships[j].Sign;
             var shipTemp = document.querySelector(".ship"+j);
             shipTemp.style.border = "5px solid red";
-            addParaToDisplay("Let's place your " + ships[j].ShipName);
+            addParaToDisplay("Press the <SPACEBAR> to rotate your " + ships[j].ShipName);
 
             var cellsUnset = document.querySelectorAll(".unset");
             for(i=0; i<cellsUnset.length; i++){
@@ -446,49 +446,65 @@ var logSquares = function(event){
 //Player 1 VS Player 2
 var gamePlay = function(){
     if (playerTurn === "One"){
-        clearDisplay();
-        addParaToDisplay(playerOneName + "'s turn! Click on a cell on your opponent's grid.");
-        var squares = document.querySelectorAll("#mainboard0 .game-square");
-        for (i=0;i<squares.length; i++){
-            squares[i].removeEventListener("click", checkClick);
-        }
-        var squares1 = document.querySelectorAll("#mainboard1 .game-square");
-        for (i=0; i<squares1.length; i++){
-            var cdn = [squares1[i].getAttribute("rowNo"), squares1[i].getAttribute("colNo")];
-            var firstIndex = cdn[0];
-            var secondIndex = cdn[1];
+        if(treasure1 !== null){
+            var squares = document.querySelectorAll(".game-square");
+            for(i=0; i<squares.length; i++){
+                squares[i].removeEventListener("click", checkClick);
+            };
+            useWeapon();
+        }else if (treasure1 === null){
+            clearDisplay();
+            addParaToDisplay(playerOneName + "'s turn! Click on a cell on your opponent's grid.");
+            var squares = document.querySelectorAll("#mainboard0 .game-square");
+            for (i=0;i<squares.length; i++){
+                squares[i].removeEventListener("click", checkClick);
+            }
+            var squares1 = document.querySelectorAll("#mainboard1 .game-square");
+            for (i=0; i<squares1.length; i++){
+                var cdn = [squares1[i].getAttribute("rowNo"), squares1[i].getAttribute("colNo")];
+                var firstIndex = cdn[0];
+                var secondIndex = cdn[1];
 
-            for (j=0;j<boardTallyTwo.length; j++){
-            if (j === parseInt(firstIndex)) {
-                for (k=0; k<boardTallyTwo[j].length; k++) {
-                    if (k === parseInt(secondIndex)) {
-                        if(boardTallyTwo[j][k] === "C" || boardTallyTwo[j][k] === "B" || boardTallyTwo[j][k] === "S" || boardTallyTwo[j][k] === "D" || boardTallyTwo[j][k] === "P" || boardTallyTwo[j][k] === "T" || boardTallyTwo[j][k] === null){
-                            squares1[i].addEventListener("click", checkClick);
+                for (j=0;j<boardTallyTwo.length; j++){
+                    if (j === parseInt(firstIndex)) {
+                        for (k=0; k<boardTallyTwo[j].length; k++) {
+                            if (k === parseInt(secondIndex)) {
+                                if(boardTallyTwo[j][k] === "C" || boardTallyTwo[j][k] === "B" || boardTallyTwo[j][k] === "S" || boardTallyTwo[j][k] === "D" || boardTallyTwo[j][k] === "P" || boardTallyTwo[j][k] === "T" || boardTallyTwo[j][k] === null){
+                                    squares1[i].addEventListener("click", checkClick);
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-    }
     }else if(playerTurn === "Two"){
-        clearDisplay();
-        addParaToDisplay(playerTwoName + "'s turn! Click on a cell on your opponent's grid.");
-        var squares = document.querySelectorAll("#mainboard1 .game-square");
-        for (i=0;i<squares.length; i++){
-            squares[i].removeEventListener("click", checkClick);
-        }
-        var squares1 = document.querySelectorAll("#mainboard0 .game-square");
-        for (i=0; i<squares1.length; i++){
-            var cdn = [squares1[i].getAttribute("rowNo"), squares1[i].getAttribute("colNo")];
-            var firstIndex = cdn[0];
-            var secondIndex = cdn[1];
-            for (j=0;j<boardTallyOne.length; j++){
-            if (j === parseInt(firstIndex)) {
-                for (k=0; k<boardTallyOne[j].length; k++) {
-                    if (k === parseInt(secondIndex)) {
-                        if(boardTallyOne[j][k] === "C" || boardTallyOne[j][k] === "B" || boardTallyOne[j][k] === "S" || boardTallyOne[j][k] === "D" || boardTallyOne[j][k] === "P" || boardTallyOne[j][k] === "T" || boardTallyOne[j][k] === null){
-                            squares1[i].addEventListener("click", checkClick);
-                        }
+        if(treasure2 !== null){
+            var squares = document.querySelectorAll(".game-square");
+            for(i=0; i<squares.length; i++){
+                squares[i].removeEventListener("click", checkClick);
+            };
+            useWeapon();
+        }else if(treasure2 === null){
+            clearDisplay();
+            addParaToDisplay(playerTwoName + "'s turn! Click on a cell on your opponent's grid.");
+            var squares = document.querySelectorAll("#mainboard1 .game-square");
+            for (i=0;i<squares.length; i++){
+                squares[i].removeEventListener("click", checkClick);
+            }
+            var squares1 = document.querySelectorAll("#mainboard0 .game-square");
+            for (i=0; i<squares1.length; i++){
+                var cdn = [squares1[i].getAttribute("rowNo"), squares1[i].getAttribute("colNo")];
+                var firstIndex = cdn[0];
+                var secondIndex = cdn[1];
+                for (j=0;j<boardTallyOne.length; j++){
+                    if (j === parseInt(firstIndex)) {
+                        for (k=0; k<boardTallyOne[j].length; k++) {
+                            if (k === parseInt(secondIndex)) {
+                                if(boardTallyOne[j][k] === "C" || boardTallyOne[j][k] === "B" || boardTallyOne[j][k] === "S" || boardTallyOne[j][k] === "D" || boardTallyOne[j][k] === "P" || boardTallyOne[j][k] === "T" || boardTallyOne[j][k] === null){
+                                    squares1[i].addEventListener("click", checkClick);
+                                }
+                            }
                         }
                     }
                 }
@@ -511,6 +527,8 @@ var checkClick = function(){
                         }else if (boardTallyTwo[i][j] === "C" || boardTallyTwo[i][j] === "B" || boardTallyTwo[i][j] === "S" || boardTallyTwo[i][j] === "D" || boardTallyTwo[i][j] === "P"){
                             this.style.backgroundImage = "url('pics/boom.png')";
                             this.style.backgroundColor = "red";
+                            this.classList.add("hit");
+                            this.classList.remove("unset");
                             boom.play();
                             totalToDestroy2--;
                             if(boardTallyTwo[i][j] === "C"){
@@ -531,11 +549,24 @@ var checkClick = function(){
                             }
                         }else if (boardTallyTwo[i][j] === null){
                             boardTallyTwo[i][j] = "X";
+                            this.classList.add("hit");
+                            this.classList.remove("unset");
                             this.style.backgroundImage = "url('pics/splash.png')";
                             splash.play();
                         }else if (boardTallyTwo[i][j] === "T"){
+                            boardTallyTwo[i][j] = "X";
+                            this.classList.add("hit");
+                            this.classList.remove("unset");
                             this.style.backgroundImage = "url('pics/treasure.png')";
                             tada.play();
+                            var tempNo = function(max) {
+                                return Math.floor(Math.random() * Math.floor(3));
+                            };
+                            treasureNum1 = tempNo(3);
+                            var temp = treasureArray[treasureNum1];
+                            treasure1 = temp;
+                            console.log("random int generated is " + treasureNum1);
+                            alert("You found a treasure chest with a " + treasure1);
                         }
                     }
                 }
@@ -551,6 +582,8 @@ var checkClick = function(){
                         }else if (boardTallyOne[i][j] === "C" || boardTallyOne[i][j] === "B" || boardTallyOne[i][j] === "S" || boardTallyOne[i][j] === "D" || boardTallyOne[i][j] === "P"){
                             this.style.backgroundImage = "url('pics/boom.png')";
                             this.style.backgroundColor = "red";
+                            this.classList.add("hit");
+                            this.classList.remove("unset");
                             boom.play();
                             totalToDestroy--;
                             if(boardTallyOne[i][j] === "C"){
@@ -571,12 +604,24 @@ var checkClick = function(){
                             }
                         }else if (boardTallyOne[i][j] === null){
                             boardTallyOne[i][j] = "X";
+                            this.classList.add("hit");
+                            this.classList.remove("unset");
                             this.style.backgroundImage = "url('pics/splash.png')";
                             splash.play();
                         }else if (boardTallyOne[i][j] === "T"){
                             boardTallyOne[i][j] = "X";
+                            this.classList.add("hit");
+                            this.classList.remove("unset");
                             this.style.backgroundImage = "url('pics/treasure.png')";
                             tada.play();
+                            var tempNo = function(max) {
+                                return Math.floor(Math.random() * Math.floor(3));
+                            };
+                            treasureNum2 = tempNo(3);
+                            var temp = treasureArray[treasureNum2];
+                            treasure2 = temp;
+                            console.log("random int generated is " + treasureNum2);
+                            alert("You found a treasure chest with a " + treasure2);
                         }
                     }
                 }
@@ -594,7 +639,6 @@ var checkForSink = function(){
             cheer.play();
             playerOneWinCount++;
             clearDisplay();
-            body.style.backgroundImage = "url('pics/sea.JPG')";
             replayGame();
         }else if(totalToDestroy2 > 0){
             if(carrierCells2 === 0){
@@ -622,7 +666,6 @@ var checkForSink = function(){
             cheer.play();
             playerTwoWinCount++;
             clearDisplay();
-            body.style.backgroundImage = "url('pics/sea.JPG')";
             replayGame();
         }else if (totalToDestroy > 0){
             if(carrierCells === 0){
@@ -741,41 +784,85 @@ var orientationChange = function(event){
     }
 }
 
-var assignTreasure = function(){
-    function getRandomInt(max) {
+var getRandomInt = function(max) {
         return Math.floor(Math.random() * Math.floor(max));
     };
+
+var assignTreasure = function(){
     var rowIndex = getRandomInt(10);
     var colIndex = getRandomInt(10);
     if (playerTurn === "One"){
-        for(i=0; i<parseInt(boardTallyOne.length); i++){
+        for(i=0; i<boardTallyOne.length; i++){
             if(i === rowIndex){
-                for(j=0; j<parseInt(boardTallyOne[i].length); j++){
+                for(j=0; j<boardTallyOne[i].length; j++){
                     if(j === colIndex){
                         if(boardTallyOne[i][j] === null){
                             boardTallyOne[i][j] = "T";
-                        }else{
+                        }else if (boardTallyOne[i][j] !== null) {
                             assignTreasure();
                         }
                     }
                 }
             }
         }
+        console.log("treasure assigned for player 1 is at " + [rowIndex, colIndex]);
     }else if (playerTurn === "Two"){
-        for(i=0; i<parseInt(boardTallyTwo.length); i++){
+        for(i=0; i<boardTallyTwo.length; i++){
             if(i === rowIndex){
-                for(j=0; j<parseInt(boardTallyTwo[i].length); j++){
+                for(j=0; j<boardTallyTwo[i].length; j++){
                     if(j === colIndex){
                         if(boardTallyTwo[i][j] === null){
                             boardTallyTwo[i][j] = "T";
-                        }else{
+                        }else if (boardTallyTwo[i][j] !== null){
                             assignTreasure();
                         }
                     }
                 }
             }
         }
+        console.log("treasure assigned for player 2 is at " + [rowIndex, colIndex]);
     }
+}
+
+var useWeapon = function(){
+    if (playerTurn === "One"){
+        if(treasure1 === "TORPEDO"){
+            console.log("torpedo!!!");
+            torpedo();
+        }else if (treasure1 === "RAIN OF FIRE"){
+            console.log("huo yu");
+            rainOfFire();
+        }else if(treasure1 === "PEEK"){
+            console.log("peekaboo!");
+            peekaboo();
+        }
+        treasure1 = null;
+    }else if (playerTurn === "Two"){
+        if(treasure2 === "TORPEDO"){
+            console.log("torpedo2!!!");
+            torpedo();
+        }else if (treasure2 === "RAIN OF FIRE2"){
+            console.log("huo yu2");
+            rainOfFire();
+        }else if(treasure2 === "PEEK"){
+            console.log("peekaboo2!");
+            peekaboo();
+        }
+        treasure2 = null;
+    }
+    gamePlay();
+}
+
+var rainOfFire = function(){
+    console.log("inside ROF function");
+}
+
+var torpedo = function(){
+    console.log("inside torpedo function");
+}
+
+var peekaboo = function(){
+    console.log("inside peek function");
 }
 
 var replayGame = function(){
