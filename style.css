@@ -7,6 +7,10 @@ body{
 	background-position: center;
 }
 
+#header{
+	width: 100%;
+}
+
 h1{
 	font-family: 'Londrina Sketch', cursive;
 	font-size:140px;
@@ -19,7 +23,7 @@ button{
 	font-family: 'Playfair Display', serif;
 	font-size: 25px;
 	margin: 0 auto;
-	width: 240px;
+	width: 300px;
 	background:transparent;
 	border: 3px solid grey;
 	padding:0.5rem 0.5rem;
@@ -184,7 +188,7 @@ p{
 #ack{
 	margin: 20px auto;
 	text-align: center;
-	color: white;
+	color: black;
 }
 
 #start2{

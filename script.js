@@ -884,6 +884,13 @@ var replayGame = function(){
         [null,null,null,null,null,null,null,null,null,null],
     ];
 
+    carrierCells = 5;
+    battleshipCells = 4;
+    submarineCells = 3;
+    destroyerCells = 3;
+    patrolCells = 2;
+    totalToDestroy = 17;
+
     boardTallyTwo = [
         [null,null,null,null,null,null,null,null,null,null],
         [null,null,null,null,null,null,null,null,null,null],
@@ -896,6 +903,13 @@ var replayGame = function(){
         [null,null,null,null,null,null,null,null,null,null],
         [null,null,null,null,null,null,null,null,null,null],
     ];
+
+    carrierCells2 = 5;
+    battleshipCells2 = 4;
+    submarineCells2 = 3;
+    destroyerCells2 = 3;
+    patrolCells2 = 2;
+    totalToDestroy2 = 17;
 
     var buttonRepeat = document.createElement("button");
     buttonRepeat.setAttribute("id", "start2");
