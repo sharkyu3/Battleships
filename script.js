@@ -8,7 +8,7 @@ var playerOneWinCount = 0;
 var playerTwoWinCount = 0;
 var treasureNum1 = null;
 var treasureNum2 = null;
-var treasureArray = ["TORPEDO", "RAIN OF FIRE", "PEEK"]
+var treasureArray = ["TORPEDO", "TORPEDO", "TORPEDO"] //["TORPEDO", "RAIN OF FIRE", "RAPID FIRING"]
 var treasure1 = null;
 var treasure2 = null;
 
@@ -51,7 +51,6 @@ var ships = [
     }
 ];
 
-// var noOfSquaresToPlace = null;
 var shipLetter = null;
 var shipsToPlace = [];
 
@@ -213,8 +212,6 @@ var makeGrid = function(){
 }
 
 var showBoth = function(){
-    body.classList.add("gradient");
-
     for(i=0; i<2; i++){
         var tempRow = document.createElement("div");
         tempRow.setAttribute("class", "col-6");
@@ -366,36 +363,30 @@ var fillShipsArray = function(){
 //Positioning of boats per player
 var fixBoats = function(){
     if(shipsToPlace.length === 0){
-        assignTreasure();
         if(playerTurn === "One"){
-            playerTurn = "Two";
-            console.log("player turn is now " + playerTurn);
-            clearGameBoardRow();
-            startCollatePlayerPositions();
-        }else{
-            playerTurn = "One";
-            clearGameBoardRow();
-            showBoth();
-            gamePlay();
+            assignTreasure();
+        }else if(playerTurn === "Two"){
+            assignTreasure();
         };
     }else{
+        console.log("placing ships for " + playerTurn + " and" + shipsToPlace[0]);
         for(j=0; j<ships.length; j++){
-        if (shipsToPlace[0] === ships[j].ShipName){
-            clearDisplay();
-            shipLetter = ships[j].Sign;
-            var shipTemp = document.querySelector(".ship"+j);
-            shipTemp.style.border = "5px solid red";
-            addParaToDisplay("Press the <SPACEBAR> to rotate your " + ships[j].ShipName);
+            if (shipsToPlace[0] === ships[j].ShipName){
+                clearDisplay();
+                shipLetter = ships[j].Sign;
+                var shipTemp = document.querySelector(".ship"+j);
+                shipTemp.style.border = "5px solid red";
+                addParaToDisplay("Press the <SPACEBAR> to rotate your " + ships[j].ShipName);
 
-            var cellsUnset = document.querySelectorAll(".unset");
-            for(i=0; i<cellsUnset.length; i++){
-                cellsUnset[i].addEventListener("click", logSquares);
-                cellsUnset[i].addEventListener("mouseover", phantom);
-                cellsUnset[i].addEventListener("mouseout", phantomOut);
+                var cellsUnset = document.querySelectorAll(".unset");
+                for(i=0; i<cellsUnset.length; i++){
+                    cellsUnset[i].addEventListener("click", logSquares);
+                    cellsUnset[i].addEventListener("mouseover", phantom);
+                    cellsUnset[i].addEventListener("mouseout", phantomOut);
+                }
             }
         }
     }
-}
 }
 
 var logSquares = function(event){
@@ -445,12 +436,9 @@ var logSquares = function(event){
 
 //Player 1 VS Player 2
 var gamePlay = function(){
+    console.log("back in gameplay function");
     if (playerTurn === "One"){
         if(treasure1 !== null){
-            var squares = document.querySelectorAll(".game-square");
-            for(i=0; i<squares.length; i++){
-                squares[i].removeEventListener("click", checkClick);
-            };
             useWeapon();
         }else if (treasure1 === null){
             clearDisplay();
@@ -470,6 +458,7 @@ var gamePlay = function(){
                         for (k=0; k<boardTallyTwo[j].length; k++) {
                             if (k === parseInt(secondIndex)) {
                                 if(boardTallyTwo[j][k] === "C" || boardTallyTwo[j][k] === "B" || boardTallyTwo[j][k] === "S" || boardTallyTwo[j][k] === "D" || boardTallyTwo[j][k] === "P" || boardTallyTwo[j][k] === "T" || boardTallyTwo[j][k] === null){
+                                    squares1[i].addEventListener("mouseover", getCellCoordinates);
                                     squares1[i].addEventListener("click", checkClick);
                                 }
                             }
@@ -480,10 +469,6 @@ var gamePlay = function(){
         }
     }else if(playerTurn === "Two"){
         if(treasure2 !== null){
-            var squares = document.querySelectorAll(".game-square");
-            for(i=0; i<squares.length; i++){
-                squares[i].removeEventListener("click", checkClick);
-            };
             useWeapon();
         }else if(treasure2 === null){
             clearDisplay();
@@ -502,6 +487,7 @@ var gamePlay = function(){
                         for (k=0; k<boardTallyOne[j].length; k++) {
                             if (k === parseInt(secondIndex)) {
                                 if(boardTallyOne[j][k] === "C" || boardTallyOne[j][k] === "B" || boardTallyOne[j][k] === "S" || boardTallyOne[j][k] === "D" || boardTallyOne[j][k] === "P" || boardTallyOne[j][k] === "T" || boardTallyOne[j][k] === null){
+                                    squares1[i].addEventListener("mouseover", getCellCoordinates);
                                     squares1[i].addEventListener("click", checkClick);
                                 }
                             }
@@ -514,9 +500,9 @@ var gamePlay = function(){
 }
 
 var checkClick = function(){
-    var cdn = [this.getAttribute("rowNo"), this.getAttribute("colNo")];
-    var firstIndex = cdn[0];
-    var secondIndex = cdn[1];
+    console.log("checking click");
+    var firstIndex = parseInt(currentX);
+    var secondIndex = parseInt(currentY);
     if(playerTurn === "One"){
         for (i=0; i<boardTallyTwo.length; i++) {
             if (i === parseInt(firstIndex)) {
@@ -736,7 +722,6 @@ var getCellCoordinates = function(event){
 
 var checkConsiders = function(){
     var cellsBeingConsidered = document.querySelectorAll(".consider");
-
     for (j=0; j<ships.length; j++){
         if(shipsToPlace[0] === ships[j].ShipName && parseInt(cellsBeingConsidered.length) === ships[j].Squares){
             for(i=0; i<cellsBeingConsidered.length; i++){
@@ -789,8 +774,10 @@ var getRandomInt = function(max) {
     };
 
 var assignTreasure = function(){
+    console.log("assigning treasure for " + playerTurn);
     var rowIndex = getRandomInt(10);
     var colIndex = getRandomInt(10);
+    console.log("index generated are: " + rowIndex + "and" + colIndex);
     if (playerTurn === "One"){
         for(i=0; i<boardTallyOne.length; i++){
             if(i === rowIndex){
@@ -799,6 +786,7 @@ var assignTreasure = function(){
                         if(boardTallyOne[i][j] === null){
                             boardTallyOne[i][j] = "T";
                         }else if (boardTallyOne[i][j] !== null) {
+                            console.log("unable to assign treaure");
                             assignTreasure();
                         }
                     }
@@ -806,7 +794,12 @@ var assignTreasure = function(){
             }
         }
         console.log("treasure assigned for player 1 is at " + [rowIndex, colIndex]);
+        playerTurn = "Two";
+        console.log("player turn is now " + playerTurn);
+        clearGameBoardRow();
+        startCollatePlayerPositions();
     }else if (playerTurn === "Two"){
+        console.log("inside player2 assign treasure");
         for(i=0; i<boardTallyTwo.length; i++){
             if(i === rowIndex){
                 for(j=0; j<boardTallyTwo[i].length; j++){
@@ -814,6 +807,7 @@ var assignTreasure = function(){
                         if(boardTallyTwo[i][j] === null){
                             boardTallyTwo[i][j] = "T";
                         }else if (boardTallyTwo[i][j] !== null){
+                            console.log("unable to assign treaure");
                             assignTreasure();
                         }
                     }
@@ -821,48 +815,296 @@ var assignTreasure = function(){
             }
         }
         console.log("treasure assigned for player 2 is at " + [rowIndex, colIndex]);
+        playerTurn = "One";
+        console.log("player turn is now " + playerTurn);
+        clearGameBoardRow();
+        showBoth();
+        gamePlay();
     }
 }
 
 var useWeapon = function(){
     if (playerTurn === "One"){
         if(treasure1 === "TORPEDO"){
-            console.log("torpedo!!!");
+            alert(playerOneName + "!\nTORPEDO is ready for use!\nClicking on one cell will blow up it's immediate neighbouring cells as well.\nUse it wisely!");
             torpedo();
         }else if (treasure1 === "RAIN OF FIRE"){
-            console.log("huo yu");
+            alert(playerOneName + "!\nRAIN OF FIRE is ready for use!\nClick on 5 cells on your opponent's grid to blow them up.\nUse it wisely!");
             rainOfFire();
-        }else if(treasure1 === "PEEK"){
-            console.log("peekaboo!");
-            peekaboo();
+        }else if(treasure1 === "RAPID FIRING"){
+            alert(playerOneName + "!\nRAPID FIRING is ready for use!\nYou have 3 seconds to click on as many cells as possible until time is up or you score a hit.\nUse it wisely!");
+            rapidfire();
         }
         treasure1 = null;
     }else if (playerTurn === "Two"){
         if(treasure2 === "TORPEDO"){
-            console.log("torpedo2!!!");
+            alert(playerTwoName + "!\nTORPEDO is ready for use!\nClicking on one cell will blow up it's immediate neighbouring cells as well.\nUse it wisely!");
             torpedo();
-        }else if (treasure2 === "RAIN OF FIRE2"){
-            console.log("huo yu2");
+        }else if (treasure2 === "RAIN OF FIRE"){
+            alert(playerTwoName + "!\nRAIN OF FIRE is ready for use!\nClick on 5 cells on your opponent's grid to blow them up.\nUse it wisely!");
             rainOfFire();
-        }else if(treasure2 === "PEEK"){
-            console.log("peekaboo2!");
-            peekaboo();
+        }else if(treasure2 === "RAPID FIRING"){
+            alert(playerTwoName + "!\nRAPID FIRING is ready for use!\nYou have 3 seconds to click on as many cells as possible until time is up or you score a hit.\nUse it wisely!");
+            rapidfire();
         }
         treasure2 = null;
     }
-    gamePlay();
 }
 
 var rainOfFire = function(){
     console.log("inside ROF function");
+    if(playerTurn === "One"){
+        playerTurn = "Two";
+    }else if (playerTurn === "Two"){
+        playerTurn = "One";
+    }
+    gamePlay();
 }
 
 var torpedo = function(){
     console.log("inside torpedo function");
+    if(playerTurn === "One"){
+        var squares1 = document.querySelectorAll("#mainboard1 .game-square");
+        for (i=0; i<squares1.length; i++){
+            var cdn = [squares1[i].getAttribute("rowNo"), squares1[i].getAttribute("colNo")];
+            var firstIndex = cdn[0];
+            var secondIndex = cdn[1];
+            for (j=0;j<boardTallyTwo.length; j++){
+                if (j === parseInt(firstIndex)) {
+                    for (k=0; k<boardTallyTwo[j].length; k++) {
+                        if (k === parseInt(secondIndex)) {
+                            if(boardTallyTwo[j][k] === "C" || boardTallyTwo[j][k] === "B" || boardTallyTwo[j][k] === "S" || boardTallyTwo[j][k] === "D" || boardTallyTwo[j][k] === "P" || boardTallyTwo[j][k] === "T" || boardTallyTwo[j][k] === null){
+                                squares1[i].addEventListener("mouseover", getCellCoordinates);
+                                squares1[i].addEventListener("mouseover", phantom9);
+                                squares1[i].addEventListener("mouseout", phantom9out);
+                                squares1[i].addEventListener("click", detonate9);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }else if (playerTurn === "Two"){
+        var squares1 = document.querySelectorAll("#mainboard0 .game-square");
+        for (i=0; i<squares1.length; i++){
+            var cdn = [squares1[i].getAttribute("rowNo"), squares1[i].getAttribute("colNo")];
+            var firstIndex = cdn[0];
+            var secondIndex = cdn[1];
+            for (j=0;j<boardTallyOne.length; j++){
+                if (j === parseInt(firstIndex)) {
+                    for (k=0; k<boardTallyOne[j].length; k++) {
+                        if (k === parseInt(secondIndex)) {
+                            if(boardTallyOne[j][k] === "C" || boardTallyOne[j][k] === "B" || boardTallyOne[j][k] === "S" || boardTallyOne[j][k] === "D" || boardTallyOne[j][k] === "P" || boardTallyOne[j][k] === "T" || boardTallyOne[j][k] === null){
+                                squares1[i].addEventListener("mouseover", getCellCoordinates);
+                                squares1[i].addEventListener("mouseover", phantom9);
+                                squares1[i].addEventListener("mouseout", phantom9out);
+                                squares1[i].addEventListener("click", detonate9);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
-var peekaboo = function(){
-    console.log("inside peek function");
+var phantom9 = function(event){
+    this.classList.add("toDetonate");
+    if(playerTurn === "One"){
+        if(boardTallyTwo[currentX][currentY] !== "H"){
+            this.style.backgroundColor = "#f938e89e";
+        }
+    }else if (playerTurn === "Two"){
+        if(boardTallyOne[currentX][currentY] !== "H"){
+            this.style.backgroundColor = "#f938e89e";
+        }
+    }
+    if (playerTurn === "One"){
+        var squaresTemp = document.querySelectorAll("#mainboard1 .game-square");
+        for(i=0; i<squaresTemp.length; i++){
+        var cdn2 = [squaresTemp[i].getAttribute("rowNo"), squaresTemp[i].getAttribute("colNo")];
+        var firstIndexInner = parseInt(cdn2[0]);
+        var secondIndexInner = parseInt(cdn2[1]);
+            if((firstIndexInner === currentX && secondIndexInner === currentY+1) || (firstIndexInner === currentX && secondIndexInner === currentY-1) || (firstIndexInner === currentX+1 && secondIndexInner === currentY) || (firstIndexInner === currentX-1 && secondIndexInner === currentY) || (firstIndexInner === currentX-1 && secondIndexInner === currentY-1) || (firstIndexInner === currentX+1 && secondIndexInner === currentY+1) || (firstIndexInner === currentX-1 && secondIndexInner === currentY+1) || (firstIndexInner === currentX+1 && secondIndexInner === currentY-1)){
+                    squaresTemp[i].classList.add("toDetonate");
+                    squaresTemp[i].style.backgroundColor = "#f1adeb9e";
+            }
+        }
+    }else if (playerTurn === "Two"){
+        var squaresTemp = document.querySelectorAll("#mainboard0 .game-square");
+        for(i=0; i<squaresTemp.length; i++){
+        var cdn2 = [squaresTemp[i].getAttribute("rowNo"), squaresTemp[i].getAttribute("colNo")];
+        var firstIndexInner = parseInt(cdn2[0]);
+        var secondIndexInner = parseInt(cdn2[1]);
+            if((firstIndexInner === currentX && secondIndexInner === currentY+1) || (firstIndexInner === currentX && secondIndexInner === currentY-1) || (firstIndexInner === currentX+1 && secondIndexInner === currentY) || (firstIndexInner === currentX-1 && secondIndexInner === currentY) || (firstIndexInner === currentX-1 && secondIndexInner === currentY-1) || (firstIndexInner === currentX+1 && secondIndexInner === currentY+1) || (firstIndexInner === currentX-1 && secondIndexInner === currentY+1) || (firstIndexInner === currentX+1 && secondIndexInner === currentY-1)){
+                    squaresTemp[i].classList.add("toDetonate");
+                    squaresTemp[i].style.backgroundColor = "#f1adeb9e";
+            }
+        }
+    }
+}
+
+var phantom9out = function(event){
+    var cellsBeingConsidered = document.querySelectorAll(".toDetonate");
+        for(i=0; i<cellsBeingConsidered.length; i++){
+            cellsBeingConsidered[i].classList.remove("toDetonate");
+            var cdn = [cellsBeingConsidered[i].getAttribute("rowNo"), cellsBeingConsidered[i].getAttribute("colNo")];
+            var rowIndex = parseInt(cdn[0]);
+            var colIndex = parseInt(cdn[1]);
+            if(playerTurn === "One"){
+                for(j=0; j<boardTallyTwo.length; j++){
+                    if(j === rowIndex){
+                        for (k=0; k<boardTallyTwo[j].length; k++){
+                            if(k === colIndex){
+                                if (boardTallyTwo[j][k] === "H"){
+                                    cellsBeingConsidered[i].style.backgroundColor = "red";
+                                }else if(boardTallyTwo[j][k] !== "H"){
+                                    cellsBeingConsidered[i].style.backgroundColor = "#fce3b2";
+                                }
+                            }
+                        }
+                    }
+                }
+            }else if (playerTurn === "Two"){
+                for(j=0; j<boardTallyOne.length; j++){
+                    if(j === rowIndex){
+                        for (k=0; k<boardTallyOne[j].length; k++){
+                            if(k === colIndex){
+                                if (boardTallyOne[j][k] === "H"){
+                                    cellsBeingConsidered[i].style.backgroundColor = "red";
+                                }else if(boardTallyOne[j][k] !== "H"){
+                                    cellsBeingConsidered[i].style.backgroundColor = "#b4ebf5c2";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+var detonate9 = function(event){
+    console.log("testing detonate 9");
+    var detonate = document.querySelectorAll(".toDetonate");
+    for(i=0; i<detonate.length; i++){
+        detonate[i].classList.remove("toDetonate");
+        var cdn = [detonate[i].getAttribute("rowNo"), detonate[i].getAttribute("colNo")];
+        var rowIndex = parseInt(cdn[0]);
+        var colIndex = parseInt(cdn[1]);
+
+        if(playerTurn === "One"){
+            for (j=0; j<boardTallyTwo.length; j++) {
+                if (j === rowIndex){
+                    for (k=0; k<boardTallyTwo[i].length; k++) {
+                        if (k === colIndex) {
+                            if(boardTallyTwo[j][k] === "H"){
+                                detonate[i].style.backgroundColor = "red";
+                            }else if(boardTallyTwo[j][k] === "X"){
+                                detonate[i].style.backgroundColor = "#fce3b2";
+                            }else if (boardTallyTwo[j][k] === "C" || boardTallyTwo[j][k] === "B" || boardTallyTwo[j][k] === "S" || boardTallyTwo[j][k] === "D" || boardTallyTwo[j][k] === "P"){
+                                detonate[i].style.backgroundImage = "url('pics/boom.png')";
+                                detonate[i].style.backgroundColor = "red";
+                                detonate[i].classList.add("hit");
+                                detonate[i].classList.remove("unset");
+                                boom.play();
+                                totalToDestroy2--;
+                                if(boardTallyTwo[j][k] === "C"){
+                                    carrierCells2--;
+                                    boardTallyTwo[j][k] = "H";
+                                }else if(boardTallyTwo[j][k] === "B"){
+                                    battleshipCells2--;
+                                    boardTallyTwo[j][k] = "H";
+                                }else if(boardTallyTwo[j][k] === "S"){
+                                    submarineCells2--;
+                                    boardTallyTwo[j][k] = "H";
+                                }else if(boardTallyTwo[j][k] === "D"){
+                                    destroyerCells2--;
+                                    boardTallyTwo[j][k] = "H";
+                                }else if(boardTallyTwo[j][k] === "P"){
+                                    patrolCells2--;
+                                    boardTallyTwo[j][k] = "H";
+                                }
+                            }else if (boardTallyTwo[j][k] === null){
+                                boardTallyTwo[j][k] = "X";
+                                detonate[i].classList.add("hit");
+                                detonate[i].classList.remove("unset");
+                                detonate[i].style.backgroundImage = "url('pics/splash.png')";
+                                splash.play();
+                            }
+                        }
+                    }
+                }
+            }
+            var squares = document.querySelectorAll("#mainboard1 .game-square");
+            for(l=0; l<squares.length; l++){
+                squares[l].removeEventListener("mouseover", getCellCoordinates);
+                squares[l].removeEventListener("mouseover", phantom9);
+                squares[l].removeEventListener("mouseout", phantom9out);
+                squares[l].removeEventListener("click", detonate9);
+            }
+        }else if (playerTurn === "Two"){
+            for (j=0; j<boardTallyOne.length; j++) {
+                if (j === rowIndex){
+                    for (k=0; k<boardTallyOne[i].length; k++) {
+                        if (k === colIndex) {
+                            if(boardTallyOne[j][k] === "H"){
+                                detonate[i].style.backgroundColor = "red";
+                            }else if(boardTallyOne[j][k] === "X"){
+                                detonate[i].style.backgroundColor = "#b4ebf5c2";
+                            }else if (boardTallyOne[j][k] === "C" || boardTallyOne[j][k] === "B" || boardTallyOne[j][k] === "S" || boardTallyOne[j][k] === "D" || boardTallyOne[j][k] === "P"){
+                                detonate[i].style.backgroundImage = "url('pics/boom.png')";
+                                detonate[i].style.backgroundColor = "red";
+                                detonate[i].classList.add("hit");
+                                detonate[i].classList.remove("unset");
+                                boom.play();
+                                totalToDestroy--;
+                                if(boardTallyOne[j][k] === "C"){
+                                    carrierCells--;
+                                    boardTallyOne[j][k] = "H";
+                                }else if(boardTallyOne[j][k] === "B"){
+                                    battleshipCells--;
+                                    boardTallyOne[j][k] = "H";
+                                }else if(boardTallyOne[j][k] === "S"){
+                                    submarineCells--;
+                                    boardTallyOne[j][k] = "H";
+                                }else if(boardTallyOne[j][k] === "D"){
+                                    destroyerCells--;
+                                    boardTallyOne[j][k] = "H";
+                                }else if(boardTallyOne[j][k] === "P"){
+                                    patrolCells--;
+                                    boardTallyOne[j][k] = "H";
+                                }
+                            }else if (boardTallyOne[j][k] === null){
+                                boardTallyOne[j][k] = "X";
+                                detonate[i].classList.add("hit");
+                                detonate[i].classList.remove("unset");
+                                detonate[i].style.backgroundImage = "url('pics/splash.png')";
+                                splash.play();
+                            }
+                        }
+                    }
+                }
+            }
+            var squares = document.querySelectorAll("#mainboard0 .game-square");
+            for(l=0; l<squares.length; l++){
+                squares[l].removeEventListener("mouseover", getCellCoordinates);
+                squares[l].removeEventListener("mouseover", phantom9);
+                squares[l].removeEventListener("mouseout", phantom9out);
+                squares[l].removeEventListener("click", detonate9);
+            }
+        }
+    }
+    checkForSink();
+}
+
+var rapidfire = function(){
+    console.log("inside rapid fire function");
+    if(playerTurn === "One"){
+        playerTurn = "Two";
+    }else if (playerTurn === "Two"){
+        playerTurn = "One";
+    }
+    gamePlay();
 }
 
 var replayGame = function(){
